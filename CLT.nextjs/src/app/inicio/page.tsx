@@ -28,8 +28,18 @@ import { Input } from "@/components/ui/input";
 import { ChevronDownIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { FunnelSimple } from "phosphor-react";
-import React from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { cursos, tags, moreTccs } from "./filters.dtypes";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Image from "next/image";
 
 export const LoggedMenu = () => {
   return (
@@ -56,43 +66,6 @@ export const LoggedMenu = () => {
   );
 };
 
-const ListTccMenu = () => {
-  return (
-    <section className="w-full flex">
-      <div className="flex w-full gap-2">
-        <Input
-          className="w-72"
-          placeholder="Buscar TCC"
-        />
-      </div>
-    </section>
-  );
-};
-
-const labels = [
-  "feature",
-  "bug",
-  "enhancement",
-  "documentation",
-  "design",
-  "question",
-  "maintenance",
-];
-const cursos = [
-  "Sistemas de Informação",
-  "Arquitetura",
-  "Engenharia de Software",
-  "Ciência da Computação",
-  "Engenharia de Computação",
-  "Engenharia de Produção",
-  "Engenharia Mecânica",
-  "Engenharia Civil",
-  "Engenharia Elétrica",
-  "Engenharia Química",
-  "Engenharia de Alimentos",
-  "Engenharia Ambiental",
-];
-
 const startPeriod = 2000;
 const years = Array.from(
   { length: new Date().getFullYear() - startPeriod + 1 },
@@ -100,6 +73,19 @@ const years = Array.from(
 );
 
 export default function Home() {
+  return (
+    <div>
+      <section>
+        <Filters />
+      </section>
+      <section className="">
+        <ListTccs />
+      </section>
+    </div>
+  );
+}
+
+const Filters = () => {
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const [selectedCursos, setSelectedCursos] = React.useState<string[]>([]);
   const [selectedPeriods, setSelectedPeriods] = React.useState<string[]>([]);
@@ -116,7 +102,6 @@ export default function Home() {
       setSelectedCursos((cursos) => cursos.filter((c) => c !== filter));
     }
   };
-
   return (
     <div className="w-full h-full relative">
       <div className="flex relative w-full">
@@ -168,7 +153,7 @@ export default function Home() {
             <DropdownMenuSeparator />
             <DropdownFilterGroup
               label={"Tags"}
-              options={labels}
+              options={tags}
               selected={selectedTags}
               setSelected={setSelectedTags}
             />
@@ -189,7 +174,7 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
 
 interface DropdownFilterGroupProps {
   label: string;
@@ -248,5 +233,67 @@ const DropdownFilterGroup = ({
         </DropdownMenuPortal>
       </DropdownMenuSub>
     </DropdownMenuGroup>
+  );
+};
+
+const ListTccs = () => {
+
+  const [flipped, setFlipped] = useState<number | null>(null);
+
+  const handleFlip = (index: number) => {
+    setFlipped(flipped === index ? null : index);
+  };
+
+  return (
+    <ul className="border p-4 grid grid-cols-4 gap-2">
+      {moreTccs.map((tcc, index) => (
+        <li key={index}>
+          <Card className="min-h-full flex flex-col justify-between pb-2 ">
+            <CardHeader className="h-28 overflow-y-auto">
+              <CardTitle>{tcc.titulo}</CardTitle>
+              {/* <CardDescription >{tcc.assunto}</CardDescription> */}
+            </CardHeader>
+            <CardContent className="flex items-center justify-center bg-[url('/Untitled.jpg')] h-72 bg-cover bg-center border">
+              {/* <Image
+                width={500}
+                height={100}
+                objectFit="cover"
+                className="rounded-md"
+                src={"/Untitled.jpg"}
+                alt={""}
+              /> */}
+            </CardContent>
+            <CardFooter className="flex items-center justify-center gap-2 pt-5">
+              <Button>
+                Download
+              </Button>
+              <Button>
+                Informações
+              </Button>
+            </CardFooter>
+            {/* <CardFooter className="overflow-x-auto max-h-20 p-4">
+              <ul>
+                <li>
+                  <span className="font-bold">Ano:</span>
+                  {tcc.ano}
+                </li>
+                <li>
+                  <span className="font-bold">Curso:</span>
+                  {tcc.curso}
+                </li>
+                <li className="overflow-x-auto">
+                  <span className="font-bold">Tags:</span>
+                  {tcc.tags.map((tag, index) => (
+                    <Badge key={index} className="ml-2">
+                      {tag}
+                    </Badge>
+                  ))}
+                </li>
+              </ul>
+            </CardFooter> */}
+          </Card>
+        </li>
+      ))}
+    </ul>
   );
 };

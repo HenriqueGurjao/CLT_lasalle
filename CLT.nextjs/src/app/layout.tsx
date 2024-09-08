@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { SideMenu } from "@/components/layout/SideMenu";
+import { LoggedMenu } from "./inicio/page";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -35,9 +36,10 @@ export default function RootLayout({
         >
           <div className="flex flex-col min-h-screen dark:bg-gray-900">
             <Header />
-            <div className="flex h-[calc(100vh-3.5rem)] ">
+            <div className="flex flex-col h-[calc(100vh-3.5rem)] ">
               {/* <SideMenu /> */}
-              <main className="flex-1 mx-auto p-4 overflow-y-auto">{children}</main>
+              <LoggedMenu/>
+              <main className="flex-1 mx-auto p-4 overflow-y-auto w-full">{children}</main>
             </div>
           </div>
         </ThemeProvider>

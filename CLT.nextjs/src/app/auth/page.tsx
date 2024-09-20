@@ -10,12 +10,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Auth() {
 
   const [login, setLogin] = useState<number>();
   const [password, setPassword] = useState<string>("");
+  const router = useRouter();
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
     // fazer a chamada para o backend para validar o login
@@ -29,6 +32,11 @@ export default function Auth() {
     setLogin(event.target.value);
   }
 
+  const submit = (event: any) => {
+    event.preventDefault();
+    // fazer a chamada para o backend para validar o login
+    router.push("/inicio")
+  }
 
   return (
     <section className=" h-full w-full flex justify-between items-center md:items-start gap-2">
@@ -67,7 +75,7 @@ export default function Auth() {
               />
               <Lock className="text-zinc-400 top-2 left-2 absolute" />  
             </div>
-            <Button className="w-full bg-cyan-800">Entrar</Button>
+            <Button onClick={submit} className="w-full bg-cyan-800">Entrar</Button>
           </CardContent>
         </Card>
       </div>

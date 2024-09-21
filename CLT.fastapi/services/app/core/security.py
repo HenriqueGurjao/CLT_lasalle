@@ -9,6 +9,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+PUBLIC_ROUTES = ["/api/v1/auth/login", "/api/v1/public"]
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -20,6 +21,7 @@ def create_access_token(data: dict):
 def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(payload)
         return payload
     except JWTError:
         return None

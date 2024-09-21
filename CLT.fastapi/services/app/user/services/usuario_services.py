@@ -1,5 +1,5 @@
-from app.domain.usuario import Aluno, Professor
-from app.repositories.usuario_repository import UsuarioRepository
+from app.user.domain.usuario import Aluno, Professor
+from app.user.repositories.usuario_repository import UsuarioRepository
 
 class UsuarioService:
     def __init__(self, usuario_repository: UsuarioRepository):

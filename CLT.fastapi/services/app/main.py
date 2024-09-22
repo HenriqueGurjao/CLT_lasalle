@@ -3,7 +3,7 @@ from app.user.api.v1.usuario_router import router as usuario_router
 from app.user.api.v1.auth_router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from app.core.security import verify_access_token
+from app.core.security import verify_access_token, decrypt_token
 from jose import jwt
 from datetime import datetime, timezone
 
@@ -29,44 +29,38 @@ app.add_middleware(
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
-    print(f"Requisição para: {request.url.path}")
 
-    if request.url.path == "/api/v1/auth/login":
+    if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json"]:
         return await call_next(request)
 
-    token = request.headers.get("Authorization")
-    print(f"Token recebido: {token}")
+    token_encrypted = request.cookies.get("auth_token")
 
-    if token is None:
+    if token_encrypted is None:
         return JSONResponse(status_code=401, content={"detail": "Token não encontrado"})
-    
+
     try:
-        if " " in token:
-            token_value = token.split(" ")[1]
-        else:
-            return JSONResponse(status_code=401, content={"detail": "Formato do token inválido"})
+        token = decrypt_token(token_encrypted)
+        # if " " in token:
+        #     token_value = token.split(" ")[1]
+        # else:
+        #     return JSONResponse(status_code=401, content={"detail": "Formato do token inválido"})
 
-        print(f"Token sem 'Bearer': {token_value}")
-
-        payload = verify_access_token(token_value)
+        payload = verify_access_token(token)
 
         if payload is None:
             return JSONResponse(status_code=401, content={"detail": "Token inválido"})
 
         exp = payload.get("exp")
-        print(f"Expiração do token: {exp}")
 
         if exp is None:
             return JSONResponse(status_code=403, content={"detail": "Token sem expiração"})
 
         exp_datetime = datetime.fromtimestamp(exp, tz=timezone.utc)
-        print(f"Data e hora de expiração do token: {exp_datetime}")
 
         if datetime.now(timezone.utc) > exp_datetime:
             return JSONResponse(status_code=403, content={"detail": "Token expirado"})
 
     except (jwt.JWTError, IndexError) as e:
-        print(f"Erro ao verificar token: {e}")
         return JSONResponse(status_code=401, content={"detail": "Token inválido"})
 
     response = await call_next(request)

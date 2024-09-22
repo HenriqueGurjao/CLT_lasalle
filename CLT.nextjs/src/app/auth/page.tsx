@@ -55,6 +55,11 @@ export default function Auth() {
     setLogin(event.target.value);
   }
 
+  const submit = (event: any) => {
+    event.preventDefault();
+    // fazer a chamada para o backend para validar o login
+    router.push("/inicio")
+  }
 
   return (
     <section className=" h-full w-full flex justify-between items-center md:items-start gap-2">

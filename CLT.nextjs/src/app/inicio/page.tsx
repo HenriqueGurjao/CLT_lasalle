@@ -40,29 +40,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export const LoggedMenu = () => {
+  const path = usePathname();
+
   return (
-    <div className="w-ful border p-2">
-      <ul className="flex gap-3">
-        <li>
-          <Link
-            className="hover:underline"
-            href={"/meus-tcc"}
-          >
-            Meus TCC
-          </Link>
-        </li>
-        <li>
-          <Link
-            className="hover:underline"
-            href={"/meus-tcc"}
-          >
-            Catalogo
-          </Link>
-        </li>
-      </ul>
-    </div>
+    <>
+      {
+        (path != "/auth" && path != "/" && (
+          <div className="w-ful border p-2">
+            <ul className="flex gap-3">
+              <li>
+                <Link
+                  className="hover:underline"
+                  href={"/meus-tcc"}
+                >
+                  Meus TCC
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className="hover:underline"
+                  href={"/meus-tcc"}
+                >
+                  Catalogo
+                </Link>
+              </li>
+            </ul>
+          </div>
+        ))}
+    </>
   );
 };
 
@@ -237,7 +245,6 @@ const DropdownFilterGroup = ({
 };
 
 const ListTccs = () => {
-
   const [flipped, setFlipped] = useState<number | null>(null);
 
   const handleFlip = (index: number) => {
@@ -251,25 +258,12 @@ const ListTccs = () => {
           <Card className="min-h-full flex flex-col justify-between pb-2 ">
             <CardHeader className="h-28 overflow-y-auto">
               <CardTitle>{tcc.titulo}</CardTitle>
-              {/* <CardDescription >{tcc.assunto}</CardDescription> */}
             </CardHeader>
             <CardContent className="flex items-center justify-center bg-[url('/Untitled.jpg')] h-72 bg-cover bg-center border">
-              {/* <Image
-                width={500}
-                height={100}
-                objectFit="cover"
-                className="rounded-md"
-                src={"/Untitled.jpg"}
-                alt={""}
-              /> */}
             </CardContent>
             <CardFooter className="flex items-center justify-center gap-2 pt-5">
-              <Button>
-                Download
-              </Button>
-              <Button>
-                Informações
-              </Button>
+              <Button>Download</Button>
+              <Button>Informações</Button>
             </CardFooter>
             {/* <CardFooter className="overflow-x-auto max-h-20 p-4">
               <ul>

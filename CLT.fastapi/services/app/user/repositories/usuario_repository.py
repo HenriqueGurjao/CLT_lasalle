@@ -1,6 +1,7 @@
-from app.domain.usuario import Usuario, Aluno, Professor
+from app.user.domain.usuario import Usuario, Aluno, Professor
 from app.db.connection import get_db_connection
 from app.core.security import hash_password
+from fastapi import HTTPException
 
 class UsuarioRepository:
     def __init__(self):
@@ -14,8 +15,7 @@ class UsuarioRepository:
                 count = cursor.fetchone()[0]
             return count > 0
         except Exception as e:
-            print(f"Erro ao verificar usuário: {e}")
-            raise
+            raise Exception (f"Erro ao verificar usuário: {e}")
         finally:
             conn.close()
 
@@ -32,7 +32,6 @@ class UsuarioRepository:
                 conn.commit()
             return usuario_id
         except Exception as e:
-            print(f"Erro ao criar usuário: {e}")
             conn.rollback()  
             raise Exception(f"Erro ao criar usuário: {str(e)}")
         finally:
@@ -69,8 +68,21 @@ class UsuarioRepository:
                 usuario_id = cursor.fetchone()[0]
                 return usuario_id
         except Exception as e:
-            print(f"Erro ao obter ID do usuário: {e}")
-            raise
+            raise Exception(f"Erro ao obter ID do usuário: {e}")
+        finally:
+            conn.close()
+
+    def obter_senha_usuario_por_matricula(self, matricula: str) -> int:
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT senha, matricula FROM usuarios WHERE matricula = %s", (matricula,))
+                result = cursor.fetchone()  
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Matrícula não encontrada")  
+                return result
+        except Exception as e:
+            raise HTTPException(status_code=404, detail="Matrícula não encontrada ")
         finally:
             conn.close()
 

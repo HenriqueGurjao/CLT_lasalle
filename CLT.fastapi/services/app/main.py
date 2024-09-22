@@ -3,9 +3,7 @@ from app.user.api.v1.usuario_router import router as usuario_router
 from app.user.api.v1.auth_router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from app.core.security import verify_access_token, decrypt_token
-from jose import jwt
-from datetime import datetime, timezone
+from app.middleware.auth_middleware import validate_token, check_user_permissions
 
 app = FastAPI(
     title="API de Usuários",
@@ -16,6 +14,7 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "http://localhost:8080",
+    "http://localhost:8000",
     "http://meudominio.com",
 ]
 
@@ -30,39 +29,20 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
 
-    if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json"]:
+    if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout"]:
         return await call_next(request)
 
     token_encrypted = request.cookies.get("auth_token")
-
+    
     if token_encrypted is None:
         return JSONResponse(status_code=401, content={"detail": "Token não encontrado"})
 
-    try:
-        token = decrypt_token(token_encrypted)
-        # if " " in token:
-        #     token_value = token.split(" ")[1]
-        # else:
-        #     return JSONResponse(status_code=401, content={"detail": "Formato do token inválido"})
+    payload = validate_token(token_encrypted, request)
+    has_permission = check_user_permissions(payload, request)
 
-        payload = verify_access_token(token)
-
-        if payload is None:
-            return JSONResponse(status_code=401, content={"detail": "Token inválido"})
-
-        exp = payload.get("exp")
-
-        if exp is None:
-            return JSONResponse(status_code=403, content={"detail": "Token sem expiração"})
-
-        exp_datetime = datetime.fromtimestamp(exp, tz=timezone.utc)
-
-        if datetime.now(timezone.utc) > exp_datetime:
-            return JSONResponse(status_code=403, content={"detail": "Token expirado"})
-
-    except (jwt.JWTError, IndexError) as e:
-        return JSONResponse(status_code=401, content={"detail": "Token inválido"})
-
+    if not has_permission:
+        return JSONResponse(status_code=403, content={"detail": "Usuário não tem permissâo para acessar este recurso"})
+    
     response = await call_next(request)
     return response
 

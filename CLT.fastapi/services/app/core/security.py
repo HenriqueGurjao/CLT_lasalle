@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 from cryptography.fernet import Fernet
-import os
+import uuid
 
 # Gera uma chave secreta
 # key = Fernet.generate_key()
@@ -14,21 +14,32 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 HASH_SECRET = os.getenv("HASH_SECRET").encode()
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
+REFRESH_TOKEN_EXPIRE_DAYS = 7
 PUBLIC_ROUTES = ["/api/v1/auth/login", "/api/v1/public"]
 
 cipher_suite = Fernet(HASH_SECRET)
+
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    issued = datetime.utcnow()
+    to_encode.update({"exp": expire, "iat": issued, "jti": str(uuid.uuid4())})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def create_refresh_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    issued = datetime.utcnow()
+    str(uuid.uuid4())
+    to_encode.update({"exp": expire, "iat": issued, "jti": str(uuid.uuid4())})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print(payload)
         return payload
     except JWTError:
         return None

@@ -10,3 +10,6 @@ class UsuarioService:
 
     def registrar_professor(self, professor: Professor):
         return self.usuario_repository.criar_professor(professor)
+    
+    def get_user_permissions(self, user):
+        return self.usuario_repository.find_user_permissions(user.matricula)

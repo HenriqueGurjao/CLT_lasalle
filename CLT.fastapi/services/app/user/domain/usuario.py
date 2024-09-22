@@ -14,4 +14,5 @@ class Aluno(Usuario):
 # Subclasse Professor
 class Professor(Usuario):
     departamento: str  
-    titulacao: str 
+    titulacao: str
+    funcao: str 

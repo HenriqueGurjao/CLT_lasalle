@@ -10,15 +10,40 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Auth() {
 
   const [login, setLogin] = useState<number>();
   const [password, setPassword] = useState<string>("");
-  const handleSubmit = (event: any) => {
+  const router = useRouter();
+
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
-    // fazer a chamada para o backend para validar o login
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ matricula: login, senha: password }),
+      });
+
+      if (!response.ok) {
+        response.status === 400 && alert('Senha inválida');
+        response.status === 404 && alert('Usuário não encontrado');
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+
+      router.push('/inicio');
+    } catch (error) {
+      alert('Erro interno no servidor'+ error);
+    }
   };
 
   const handlePasswordChange = (event: any) => {
@@ -67,7 +92,7 @@ export default function Auth() {
               />
               <Lock className="text-zinc-400 top-2 left-2 absolute" />  
             </div>
-            <Button className="w-full bg-cyan-800">Entrar</Button>
+            <Button onClick={(e) => handleSubmit(e)} className="w-full bg-cyan-800">Entrar</Button>
           </CardContent>
         </Card>
       </div>

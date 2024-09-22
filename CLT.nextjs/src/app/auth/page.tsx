@@ -38,6 +38,7 @@ export default function Auth() {
       }
 
       const data = await response.json();
+      console.log(data)
       localStorage.setItem('token', data.token);
 
       router.push('/inicio');

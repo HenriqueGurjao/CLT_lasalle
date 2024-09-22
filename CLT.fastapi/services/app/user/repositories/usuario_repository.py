@@ -19,6 +19,24 @@ class UsuarioRepository:
         finally:
             conn.close()
 
+    def find_user_permissions(self, matricula: str):
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                                SELECT funcao FROM CLT_LASALLE.PROFESSORES P 
+                                INNER JOIN CLT_LASALLE.USUARIOS U 
+                                ON P.USUARIO_ID = U.ID
+                                WHERE u.MATRICULA = %s;""", (matricula,)
+                            )
+                role = cursor.fetchone()[0]
+            return role
+        except Exception as e:
+            return "ALUNO"
+            # raise Exception (f"Erro ao verificar permissões do usuário: {e} {matricula}")
+        finally:
+            conn.close
+
     def criar_usuario(self, usuario: Usuario):
             
         conn = get_db_connection() 
@@ -99,9 +117,9 @@ class UsuarioRepository:
         try:
             with conn.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO professores (usuario_id, departamento, titulacao)
-                    VALUES (%s, %s, %s)
-                """, (usuario_id, professor.departamento, professor.titulacao))
+                    INSERT INTO professores (usuario_id, departamento, titulacao, funcao)
+                    VALUES (%s, %s, %s, %s)
+                """, (usuario_id, professor.departamento, professor.titulacao, professor.funcao))
                 conn.commit()
         except Exception as e:
             conn.rollback() 

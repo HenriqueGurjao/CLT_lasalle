@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Response, Request
 from app.user.repositories.usuario_repository import UsuarioRepository
+from app.middleware.auth_middleware import refresh_token
 from app.user.services.auth_service import AuthService
 from app.user.domain.auth import LoginRequest 
 from app.core.security import encrypt_token
@@ -11,8 +12,7 @@ usuario_repository = UsuarioRepository()
 auth_service = AuthService(usuario_repository)
 
 @router.post("/auth/login")
-def login(request: LoginRequest, response: Response, req: Request):  
-    user_agent = req.headers.get("User-Agent")
+def login(request: LoginRequest, response: Response, req: Request): 
     user = auth_service.login(request.matricula, request.senha, req) 
     
 
@@ -43,3 +43,7 @@ def logout(response: Response):
     response.delete_cookie("auth_token")  
     response.delete_cookie("refresh_token")
     return {"message": "Logout successful"}
+
+@router.post("/api/v1/auth/refresh")
+async def refresh(request: Request):
+    return refresh_token(request)

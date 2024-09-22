@@ -1,7 +1,7 @@
 from fastapi import Request
 from jose import jwt
 from starlette.responses import JSONResponse
-from app.core.security import verify_access_token, decrypt_token
+from app.core.security import verify_access_token, decrypt_token, create_access_token, create_refresh_token, encrypt_token
 from datetime import datetime, timezone
 from jose import jwt
 
@@ -32,6 +32,49 @@ def validate_token(token_encrypted: str, request: Request):
     except (jwt.JWTError, IndexError) as e:
         return JSONResponse(status_code=401, content={"detail": "Token inválido"})
     
+def refresh_token(request: Request):
+    refresh_token_encrypted = request.cookies.get("refresh_token")
+    print("refresh token encrypted", refresh_token_encrypted)
+    
+    if refresh_token_encrypted is None:
+        return JSONResponse(status_code=401, content={"detail": "Token não encontrado"})
+    
+    try:
+        refresh_token = decrypt_token(refresh_token_encrypted)
+        
+        payload = verify_access_token(refresh_token)  
+
+        if payload is None:
+            return JSONResponse(status_code=401, content={"detail": "Refresh token inválido"})
+
+        exp = payload.get("exp")
+        if exp is None or datetime.now(timezone.utc) > datetime.fromtimestamp(exp, tz=timezone.utc):
+            return JSONResponse(status_code=403, content={"detail": "Refresh token expirado"})
+
+        # Criar novos tokens
+        new_access_token = create_access_token(data={
+            "sub": payload["sub"], 
+            "role": payload["role"],
+            "user-agent": payload.get("user-agent")
+        })
+        new_refresh_token = create_refresh_token(data={
+            "sub": payload["sub"], 
+            "role": payload["role"],
+            "user-agent": payload.get("user-agent")
+        })
+
+        response = JSONResponse(content={
+            "access_token": new_access_token, 
+            "refresh_token": new_refresh_token
+        })
+        response.set_cookie(key="auth_token", value=encrypt_token(new_access_token), httponly=True)
+        response.set_cookie(key="refresh_token", value=encrypt_token(new_refresh_token), httponly=True)
+        
+        return response
+
+    except Exception as e:
+        return JSONResponse(status_code=401, content={"detail": f"Erro ao processar refresh token: {e}"})
+
 def check_user_permissions(payload, request: Request):
 
     endpoint = request.url.path 

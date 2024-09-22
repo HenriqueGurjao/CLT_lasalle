@@ -4,6 +4,9 @@ from app.user.api.v1.auth_router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from app.middleware.auth_middleware import validate_token, check_user_permissions
+from app.user.services.usuario_services import UsuarioService
+from app.user.repositories.usuario_repository import UsuarioRepository
+from app.user.domain.usuario import Professor
 
 app = FastAPI(
     title="API de Usuários",
@@ -35,7 +38,7 @@ async def auth_middleware(request: Request, call_next):
     token_encrypted = request.cookies.get("auth_token")
     
     if token_encrypted is None:
-        return JSONResponse(status_code=401, content={"detail": "Token não encontrado"})
+        return JSONResponse(status_code=401, content={"detail": "Usuario nao autenticado"})
 
     payload = validate_token(token_encrypted, request)
     has_permission = check_user_permissions(payload, request)
@@ -45,6 +48,28 @@ async def auth_middleware(request: Request, call_next):
     
     response = await call_next(request)
     return response
+
+@app.on_event("startup")
+async def startup_event():
+    usuario_repository = UsuarioRepository()
+    usuario_service = UsuarioService(usuario_repository)  
+    try:
+        admin = usuario_service.get_user_by_matricula('admin')  
+    except:
+        admin = None
+
+    if admin is None:
+        admin = Professor(
+            departamento="Administração",
+            nome="Administrador",
+            matricula="admin",
+            email="prof.admin@example.com",
+            senha="admin123",
+            funcao="COORDENADOR",    
+            titulacao="ADMIN"
+        )
+        usuario_service.registrar_professor(admin)  
+
 
 app.include_router(usuario_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")

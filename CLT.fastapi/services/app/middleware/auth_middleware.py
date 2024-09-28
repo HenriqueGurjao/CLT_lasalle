@@ -34,7 +34,6 @@ def validate_token(token_encrypted: str, request: Request):
     
 def refresh_token(request: Request):
     refresh_token_encrypted = request.cookies.get("refresh_token")
-    print("refresh token encrypted", refresh_token_encrypted)
     
     if refresh_token_encrypted is None:
         return JSONResponse(status_code=401, content={"detail": "Token não encontrado"})
@@ -51,7 +50,6 @@ def refresh_token(request: Request):
         if exp is None or datetime.now(timezone.utc) > datetime.fromtimestamp(exp, tz=timezone.utc):
             return JSONResponse(status_code=403, content={"detail": "Refresh token expirado"})
 
-        # Criar novos tokens
         new_access_token = create_access_token(data={
             "sub": payload["sub"], 
             "role": payload["role"],
@@ -85,7 +83,6 @@ def check_user_permissions(payload, request: Request):
 
     role = payload.get("role")
 
-    #Trocar para if not starts e ver se o metodo for diferente de get, ai retorna false.
     if not role.startswith("COORDENADOR") and endpoint.startswith("/api/v1/coordenador/") and method != "GET":
         return False
     elif not role.startswith("PROFESSOR") and endpoint.startswith("/api/v1/professor/admin") and method != "GET":
@@ -93,3 +90,13 @@ def check_user_permissions(payload, request: Request):
     
     return True
     
+def is_user_active(payload, request: Request):
+    #verificar no banco se o usuario possui conta ativada para uso
+    matricula = payload.get("sub")
+    if matricula is None:
+        return JSONResponse(status_code=403, content={"detail": "Matrícula não fornecida no token"})
+    
+    #consultar no banco se o usuario possui conta ativada
+    #...
+    
+    return True # retorna True se o usuario possui conta ativada, False caso contrario

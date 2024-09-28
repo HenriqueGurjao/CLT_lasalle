@@ -53,22 +53,27 @@ async def auth_middleware(request: Request, call_next):
 async def startup_event():
     usuario_repository = UsuarioRepository()
     usuario_service = UsuarioService(usuario_repository)  
+    
     try:
-        admin = usuario_service.get_user_by_matricula('admin')  
+        admin = usuario_service.get_user_by_matricula('admin')  # Busca pelo admin
     except:
         admin = None
 
     if admin is None:
-        admin = Professor(
-            departamento="Administração",
-            nome="Administrador",
-            matricula="admin",
-            email="prof.admin@example.com",
-            senha="admin123",
-            funcao="COORDENADOR",    
-            titulacao="ADMIN"
-        )
-        usuario_service.registrar_professor(admin)  
+        if not usuario_repository.usuario_existe("prof.admin@example.com"):
+            admin = Professor(
+                departamento="Administração",
+                nome="Administrador",
+                matricula="admin",
+                email="prof.admin@example.com",
+                senha="admin123",
+                funcao="COORDENADOR", 
+                ativo=True,   
+                titulacao="ADMIN"
+            )
+            usuario_service.registrar_professor(admin)  
+        else:
+            print("O email 'prof.admin@example.com' já está cadastrado.")  
 
 
 app.include_router(usuario_router, prefix="/api/v1")

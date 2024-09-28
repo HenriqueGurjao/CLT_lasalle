@@ -9,7 +9,7 @@ def get_usuario_service() -> UsuarioService:
     usuario_repository = UsuarioRepository()
     return UsuarioService(usuario_repository)
 
-@router.post("/alunos")
+@router.post("/curso")
 def criar_aluno(aluno: Aluno, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
         usuario_service.registrar_aluno(aluno)
@@ -18,7 +18,7 @@ def criar_aluno(aluno: Aluno, usuario_service: UsuarioService = Depends(get_usua
         raise HTTPException(status_code=400, detail=str(e))
 
 # Criar professor
-@router.post("/professores")
+@router.post("/curso/alocar/{matricula}")
 def criar_professor(professor: Professor, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
         usuario_service.registrar_professor(professor)

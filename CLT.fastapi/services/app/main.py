@@ -1,15 +1,16 @@
 from fastapi import FastAPI, Request
 from app.user.api.v1.usuario_router import router as usuario_router
 from app.user.api.v1.auth_router import router as auth_router
+from app.ms.course.api.v1.course_router import router as course_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from app.middleware.auth_middleware import validate_token, check_user_permissions, is_user_active
+from app.middleware.auth_middleware import validate_token, check_user_permissions, is_user_active, is_self_management
 from app.user.services.usuario_services import UsuarioService
 from app.user.repositories.usuario_repository import UsuarioRepository
 from app.user.domain.usuario import Professor
 
 app = FastAPI(
-    title="API de Usuários",
+    title="API CLT de Usuários",
     description="API de gerenciamento de usuários",
     version="1.0.0",
 )
@@ -32,25 +33,36 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
 
-    if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout"]:
-        return await call_next(request)
+    try:
+        if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout"]:
+            return await call_next(request)
 
-    token_encrypted = request.cookies.get("auth_token")
-    
-    if token_encrypted is None:
-        return JSONResponse(status_code=401, content={"detail": "Usuario nao autenticado"})
+        token_encrypted = request.cookies.get("auth_token")
+        
+        if token_encrypted is None:
+            return JSONResponse(status_code=401, content={"detail": "Usuario nao autenticado"})
 
-    payload = validate_token(token_encrypted, request)
+        payload = validate_token(token_encrypted, request)
 
-    if not is_user_active(payload, request) and request.url.path not in ["/api/v1/self/ativar_conta"]:
-        return JSONResponse(status_code=403, content={"detail": "Conta nao esta ativa"})
+        if isinstance(payload, dict):
+            if not is_user_active(payload, request) and request.url.path not in ["/api/v1/self/ativar_conta"]:
+                return JSONResponse(status_code=403, content={"detail": "Conta nao esta ativa"})
 
-    has_permission = check_user_permissions(payload, request)
-    if not has_permission:
-        return JSONResponse(status_code=403, content={"detail": "Usuário não tem permissâo para acessar este recurso"})
-    
-    response = await call_next(request)
-    return response
+            has_permission = check_user_permissions(payload, request)
+            if not has_permission:
+                return JSONResponse(status_code=403, content={"detail": "Usuário não tem permissâo para acessar este recurso"})
+            
+            # self_management = is_self_management(payload, request)
+            # if not self_management:
+            #     return JSONResponse(status_code=403, content={"detail": "Usuario nao pode manipular dados de outros usuarios"})
+
+            response = await call_next(request)
+            if response is None:
+                return JSONResponse({"error": "No response"}, status_code=500)
+            return response
+    except Exception as e:
+        return JSONResponse(status_code=401, content={"detail": f"Erro ao processar token: {e}"})
+            
 
 @app.on_event("startup")
 async def startup_event():
@@ -81,6 +93,7 @@ async def startup_event():
 
 app.include_router(usuario_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(course_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn

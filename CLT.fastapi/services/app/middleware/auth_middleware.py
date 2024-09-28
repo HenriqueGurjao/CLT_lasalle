@@ -1,4 +1,4 @@
-from fastapi import Request
+from fastapi import HTTPException, Request
 from jose import jwt
 from starlette.responses import JSONResponse
 from app.core.security import verify_access_token, decrypt_token, create_access_token, create_refresh_token, encrypt_token
@@ -101,6 +101,31 @@ def check_user_permissions(payload, request: Request):
         return False
     
     return True
+
+def is_self_management(payload, request: Request):
+
+    path_matricula = request.path_params.get("matricula")
+    query_matricula = request.query_params.get("matricula")
+    
+     # Imprimir os valores para debug
+    print(f"Query Params: {query_matricula}, Path Params: {path_matricula}")
+
+    endpoint = request.url.path 
+    matricula = payload.get("sub")
+    print(endpoint)
+
+    if endpoint.__contains__("/self"):
+
+        if not matricula:
+            raise HTTPException(status_code=400, detail="Matrícula não fornecida.")
+        
+        print("entrei 1")
+        usuario_repository = UsuarioRepository()
+        # bd_matricula = usuario_repository.obter_aluno_por_matricula(request.path_params["matricula"] or request.query_params["matricula"])
+        # if not matricula == bd_matricula['matricula']:
+        #     print("entrei 2")
+        #     return False
+        return True
     
 def is_user_active(payload, request: Request):
     #verificar no banco se o usuario possui conta ativada para uso

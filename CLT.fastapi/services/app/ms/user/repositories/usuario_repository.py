@@ -1,5 +1,5 @@
 from fastapi.responses import JSONResponse
-from app.user.domain.usuario import Usuario, Aluno, Professor
+from app.ms.user.domain.usuario import Usuario, Aluno, Professor
 from app.db.connection import get_db_connection
 from app.core.security import hash_password
 from fastapi import HTTPException, Request

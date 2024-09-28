@@ -1,6 +1,5 @@
 from app.db.connection import get_db_connection
 from fastapi import HTTPException
-from psycopg2 import sql
 
 class CursoRepository:
     def __init__(self):

@@ -1,4 +1,4 @@
-from app.user.repositories.usuario_repository import UsuarioRepository
+from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from app.core.security import create_access_token, verify_password, create_refresh_token
 from fastapi import  HTTPException, Request
 

@@ -1,5 +1,5 @@
-from app.user.domain.usuario import Aluno, Professor
-from app.user.repositories.usuario_repository import UsuarioRepository
+from app.ms.user.domain.usuario import Aluno, Professor
+from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from app.core.security import verify_password
 
 class UsuarioService:

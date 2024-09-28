@@ -1,13 +1,14 @@
 from fastapi import FastAPI, Request
-from app.user.api.v1.usuario_router import router as usuario_router
-from app.user.api.v1.auth_router import router as auth_router
+from app.ms.user.api.v1.usuario_router import router as usuario_router
+from app.ms.user.api.v1.auth_router import router as auth_router
 from app.ms.course.api.v1.course_router import router as course_router
+from app.ms.final_paper.api.v1.projeto_final_router import router as projeto_final_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from app.middleware.auth_middleware import validate_token, check_user_permissions, is_user_active, is_self_management
-from app.user.services.usuario_services import UsuarioService
-from app.user.repositories.usuario_repository import UsuarioRepository
-from app.user.domain.usuario import Professor
+from app.ms.user.services.usuario_services import UsuarioService
+from app.ms.user.repositories.usuario_repository import UsuarioRepository
+from app.ms.user.domain.usuario import Professor
 
 app = FastAPI(
     title="API CLT de Usuários",
@@ -87,13 +88,13 @@ async def startup_event():
                 titulacao="ADMIN"
             )
             usuario_service.registrar_professor(admin)  
-        else:
-            print("O email 'prof.admin@example.com' já está cadastrado.")  
+          
 
 
 app.include_router(usuario_router, prefix="/api/v1")
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(course_router, prefix="/api/v1")
+app.include_router(projeto_final_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn

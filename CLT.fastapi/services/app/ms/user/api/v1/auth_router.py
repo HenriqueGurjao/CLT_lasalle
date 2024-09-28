@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Response, Request
-from app.user.repositories.usuario_repository import UsuarioRepository
+from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from app.middleware.auth_middleware import refresh_token
-from app.user.services.auth_service import AuthService
-from app.user.domain.auth import LoginRequest 
+from app.ms.user.services.auth_service import AuthService
+from app.ms.user.domain.auth import LoginRequest 
 from app.core.security import encrypt_token
 from datetime import timedelta
 

@@ -2,8 +2,8 @@ from fastapi import HTTPException, Request
 from jose import jwt
 from starlette.responses import JSONResponse
 from app.core.security import verify_access_token, decrypt_token, create_access_token, create_refresh_token, encrypt_token
-from app.user.services.usuario_services import UsuarioService
-from app.user.repositories.usuario_repository import UsuarioRepository
+from app.ms.user.services.usuario_services import UsuarioService
+from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from datetime import datetime, timezone
 from jose import jwt
 

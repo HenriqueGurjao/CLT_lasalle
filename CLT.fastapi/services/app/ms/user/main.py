@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
-from app.user.api.v1.usuario_router import router as usuario_router
-from app.user.api.v1.auth_router import router as auth_router
+from app.ms.user.api.v1.usuario_router import router as usuario_router
+from app.ms.user.api.v1.auth_router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 

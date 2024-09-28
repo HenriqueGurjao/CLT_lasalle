@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.user.domain.usuario import Aluno, Professor, UpdatePassword
-from app.user.repositories.usuario_repository import UsuarioRepository
-from app.user.services.usuario_services import UsuarioService
+from app.ms.user.domain.usuario import Aluno, Professor, UpdatePassword
+from app.ms.user.repositories.usuario_repository import UsuarioRepository
+from app.ms.user.services.usuario_services import UsuarioService
 
 router = APIRouter()
 

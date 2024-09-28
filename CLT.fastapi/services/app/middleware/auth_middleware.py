@@ -2,6 +2,8 @@ from fastapi import Request
 from jose import jwt
 from starlette.responses import JSONResponse
 from app.core.security import verify_access_token, decrypt_token, create_access_token, create_refresh_token, encrypt_token
+from app.user.services.usuario_services import UsuarioService
+from app.user.repositories.usuario_repository import UsuarioRepository
 from datetime import datetime, timezone
 from jose import jwt
 
@@ -34,7 +36,6 @@ def validate_token(token_encrypted: str, request: Request):
     
 def refresh_token(request: Request):
     refresh_token_encrypted = request.cookies.get("refresh_token")
-    print("refresh token encrypted", refresh_token_encrypted)
     
     if refresh_token_encrypted is None:
         return JSONResponse(status_code=401, content={"detail": "Token não encontrado"})
@@ -51,7 +52,6 @@ def refresh_token(request: Request):
         if exp is None or datetime.now(timezone.utc) > datetime.fromtimestamp(exp, tz=timezone.utc):
             return JSONResponse(status_code=403, content={"detail": "Refresh token expirado"})
 
-        # Criar novos tokens
         new_access_token = create_access_token(data={
             "sub": payload["sub"], 
             "role": payload["role"],
@@ -85,7 +85,16 @@ def check_user_permissions(payload, request: Request):
 
     role = payload.get("role")
 
-    #Trocar para if not starts e ver se o metodo for diferente de get, ai retorna false.
+    # print("entrei")
+    # if endpoint.__contains__("/self"):
+    #     print("entrei 1")
+    #     usuario_repository = UsuarioRepository()
+    #     bd_matricula = usuario_repository.obter_aluno_por_matricula(request.path_params["matricula"] or request.query_params["matricula"])
+    #     print(matricula, bd_matricula["matricula"])
+    #     if not matricula == bd_matricula['matricula']:
+    #         print("entrei 2")
+    #         return JSONResponse(status_code=403, content={"detail": "Usuario nao pode manipular dados de outros usuarios"})
+
     if not role.startswith("COORDENADOR") and endpoint.startswith("/api/v1/coordenador/") and method != "GET":
         return False
     elif not role.startswith("PROFESSOR") and endpoint.startswith("/api/v1/professor/admin") and method != "GET":
@@ -93,3 +102,19 @@ def check_user_permissions(payload, request: Request):
     
     return True
     
+def is_user_active(payload, request: Request):
+    #verificar no banco se o usuario possui conta ativada para uso
+    usuario_repository = UsuarioRepository()
+    usuario_service = UsuarioService(usuario_repository)
+
+    matricula = payload.get("sub")
+    if matricula is None:
+        return JSONResponse(status_code=403, content={"detail": "Matrícula não fornecida no token"})
+    
+    is_active = usuario_service.is_account_active(matricula)
+
+    if not is_active:
+        return False
+        return JSONResponse(status_code=403, content={"detail": "Conta do usuário está desativada"})
+    
+    return True # retorna True se o usuario possui conta ativada, False caso contrario

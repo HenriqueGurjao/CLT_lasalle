@@ -11,7 +11,7 @@ router = APIRouter()
 usuario_repository = UsuarioRepository()
 auth_service = AuthService(usuario_repository)
 
-@router.post("/auth/login")
+@router.post("/auth/login", tags=["Autentificacao"])
 def login(request: LoginRequest, response: Response, req: Request): 
     user = auth_service.login(request.matricula, request.senha, req) 
     
@@ -38,12 +38,12 @@ def login(request: LoginRequest, response: Response, req: Request):
     
     raise HTTPException(status_code=400, detail="Matricula ou senha incorretos")
 
-@router.post("/auth/logout")
+@router.post("/auth/logout", tags=["Autentificacao"])
 def logout(response: Response):
     response.delete_cookie("auth_token")  
     response.delete_cookie("refresh_token")
     return {"message": "Logout successful"}
 
-@router.post("/api/v1/auth/refresh")
+@router.post("/api/v1/auth/refresh", tags=["Autentificacao"])
 async def refresh(request: Request):
     return refresh_token(request)

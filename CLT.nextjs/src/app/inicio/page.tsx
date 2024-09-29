@@ -28,9 +28,9 @@ import { Input } from "@/components/ui/input";
 import { ChevronDownIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { FunnelSimple } from "phosphor-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { cursos, tags, moreTccs } from "./filters.dtypes";
+import { tags, moreTccs, ProjetoFinal } from "./filters.dtypes";
 import {
   Card,
   CardContent,
@@ -41,6 +41,8 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthProvider";
+import fetchWithAuth from "@/utils/fetchWithAuth";
 
 export const LoggedMenu = () => {
   const path = usePathname();
@@ -93,23 +95,46 @@ export default function Home() {
   );
 }
 
+interface FilterProps {
+  nome: string;
+  id: number;
+}
+
 const Filters = () => {
-  const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
-  const [selectedCursos, setSelectedCursos] = React.useState<string[]>([]);
-  const [selectedPeriods, setSelectedPeriods] = React.useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = React.useState<FilterProps[]>([]);
+  const [selectedCursos, setSelectedCursos] = React.useState<FilterProps[]>([]);
+  const [selectedPeriods, setSelectedPeriods] = React.useState<FilterProps[]>([]);
+  const [cursos, setCursos] = React.useState<FilterProps[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchWithAuth("http://localhost:8000/api/v1/cursos/resumido");
+
+        // Atualize seu estado de cursos, se necessário
+        const data = await response?.json();
+        setCursos(data); 
+      } catch (error) {
+        console.error("Error fetching cursos:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleRemoveFilter = (
-    filter: string,
+    filter: FilterProps,
     type: "tag" | "curso" | "year"
   ) => {
     if (type === "tag") {
-      setSelectedTags((tags) => tags.filter((t) => t !== filter));
+      setSelectedTags((tags) => tags.filter((t) => t.id !== filter.id));
     } else if (type === "year") {
-      setSelectedPeriods((periods) => periods.filter((p) => p !== filter));
+      setSelectedPeriods((periods) => periods.filter((p) => p.id !== filter.id)); // Supondo que os períodos também são FilterProps
     } else {
-      setSelectedCursos((cursos) => cursos.filter((c) => c !== filter));
+      setSelectedCursos((cursos) => cursos.filter((c) => c.id !== filter.id));
     }
   };
+
   return (
     <div className="w-full h-full relative">
       <div className="flex relative w-full">
@@ -117,33 +142,28 @@ const Filters = () => {
           Filtros
         </span>
         <ul className="flex gap-1 border p-1 w-full min-h-10 flex-wrap">
-          {[...selectedTags, ...selectedCursos, ...selectedPeriods].map(
-            (filter) => (
-              <li
-                key={filter}
-                className="relative select-none"
+          {[...selectedTags, ...selectedCursos, ...selectedPeriods].map((filter) => (
+            <li key={filter.id} className="relative select-none">
+              <Button
+                onClick={() =>
+                  handleRemoveFilter(
+                    filter,
+                    selectedTags.includes(filter)
+                      ? "tag"
+                      : selectedCursos.includes(filter)
+                      ? "curso"
+                      : "year"
+                  )
+                }
+                className="absolute w-3 h-3 p-0 right-0 bg-yellow-500 hover:bg-yellow-700"
               >
-                <Button
-                  onClick={() =>
-                    handleRemoveFilter(
-                      filter,
-                      selectedTags.includes(filter)
-                        ? "tag"
-                        : selectedCursos.includes(filter)
-                        ? "curso"
-                        : "year"
-                    )
-                  }
-                  className="absolute w-3 h-3 p-0 right-0 bg-yellow-500 hover:bg-yellow-700"
-                >
-                  <XIcon size={10} />
-                </Button>
-                <Badge className="bg-blue-900 hover:bg-blue-800 whitespace-nowrap">
-                  {filter}
-                </Badge>
-              </li>
-            )
-          )}
+                <XIcon size={10} />
+              </Button>
+              <Badge className="bg-blue-900 hover:bg-blue-800 whitespace-nowrap">
+                {filter.nome} {/* Usando a propriedade 'nome' do FilterProps */}
+              </Badge>
+            </li>
+          ))}
         </ul>
       </div>
       <div className="absolute right-0 top-0">
@@ -159,21 +179,21 @@ const Filters = () => {
               <span>Filtros</span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownFilterGroup
+            {/* <DropdownFilterGroup
               label={"Tags"}
-              options={tags}
+              options={tags} // Certifique-se de que 'tags' é um array de FilterProps
               selected={selectedTags}
               setSelected={setSelectedTags}
-            />
+            /> */}
             <DropdownFilterGroup
               label={"Cursos"}
-              options={cursos}
+              options={cursos} // Certifique-se de que 'cursos' é um array de FilterProps
               selected={selectedCursos}
               setSelected={setSelectedCursos}
             />
             <DropdownFilterGroup
               label="Ano"
-              options={years.toReversed().map((year) => year.toString())}
+              options={years.toReversed().map((year) => ({ nome: year.toString(), id: year }))} // Atualize para usar FilterProps
               selected={selectedPeriods}
               setSelected={setSelectedPeriods}
             />
@@ -184,11 +204,12 @@ const Filters = () => {
   );
 };
 
+
 interface DropdownFilterGroupProps {
   label: string;
-  options: string[];
-  selected: string[];
-  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+  options: FilterProps[]; 
+  selected: FilterProps[];
+  setSelected: React.Dispatch<React.SetStateAction<FilterProps[]>>;
 }
 
 const DropdownFilterGroup = ({
@@ -197,12 +218,11 @@ const DropdownFilterGroup = ({
   selected,
   setSelected,
 }: DropdownFilterGroupProps) => {
-  const handleSelect = (value: string) => {
-    // ts-ignore
-    setSelected((prev: string[]) => {
-      const isAlreadySelected = prev.includes(value);
+  const handleSelect = (option: FilterProps) => {
+    setSelected((prev) => {
+      const isAlreadySelected = prev.some((item) => item.id === option.id);
       if (!isAlreadySelected) {
-        return [...prev, value];
+        return [...prev, option];
       }
       return prev;
     });
@@ -224,14 +244,14 @@ const DropdownFilterGroup = ({
                 <CommandEmpty>Sem resultados.</CommandEmpty>
                 <CommandGroup>
                   {options
-                    .filter((option) => !selected.includes(option))
+                    .filter((option) => !selected.some((selectedOption) => selectedOption.id === option.id))
                     .map((option) => (
                       <CommandItem
-                        key={option}
-                        value={option}
-                        onSelect={() => handleSelect(option)}
+                        key={option.id} // Use o ID para a chave
+                        value={option.nome} // Use o nome ou outro identificador relevante
+                        onSelect={() => handleSelect(option)} // Passe o objeto FilterProps
                       >
-                        {option}
+                        {option.nome} {/* Renderize o nome ou outro atributo relevante */}
                       </CommandItem>
                     ))}
                 </CommandGroup>
@@ -244,16 +264,35 @@ const DropdownFilterGroup = ({
   );
 };
 
+
 const ListTccs = () => {
   const [flipped, setFlipped] = useState<number | null>(null);
+  const [projetos, setProjetos] = useState<ProjetoFinal[] | null>(null);
+
+  const { user } = useAuth();
 
   const handleFlip = (index: number) => {
     setFlipped(flipped === index ? null : index);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchWithAuth("http://localhost:8000/api/v1/projetos");
+        const data = await response?.json();
+
+        setProjetos(data);
+      } catch (error) {
+        console.error("Error fetching tccs:", error);
+      }
+    }
+    
+    fetchData();
+  }, [])
+
   return (
     <ul className="border p-4 grid grid-cols-4 gap-2">
-      {moreTccs.map((tcc, index) => (
+      {projetos ? projetos.map((tcc, index) => (
         <li key={index}>
           <Card className="min-h-full flex flex-col justify-between pb-2 ">
             <CardHeader className="h-28 overflow-y-auto">
@@ -287,7 +326,11 @@ const ListTccs = () => {
             </CardFooter> */}
           </Card>
         </li>
-      ))}
+      )) : (
+        <div>
+          carregando
+        </div>
+      )}
     </ul>
   );
 };

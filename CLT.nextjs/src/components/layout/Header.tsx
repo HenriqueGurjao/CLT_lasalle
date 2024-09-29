@@ -8,15 +8,39 @@ import { Button } from "../ui/button";
 import { MagnifyingGlass } from "phosphor-react";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
+import fetchWithAuth from "@/utils/fetchWithAuth";
 
 export const Header = () => {
   const path = usePathname();
-  const { loading } = useAuth();
-  const router = useRouter();
+  const { setUser } = useAuth();
+
+  const matriculaLocalStorage = localStorage.getItem("matricula");
 
   useEffect(() => {
-    
-  }, []);
+    const fetchData = async () => {
+
+      const endpoint = `http://localhost:8000/api/v1/aluno/${matriculaLocalStorage}`
+      if (path === "/" || path === "/auth") return;
+      try {
+        const response  = await fetchWithAuth (endpoint, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+
+        const data = await response?.json();
+       
+        setUser(data);
+      } catch (error) {
+        console.error("Fetch failed:", error);
+      }
+
+    }
+
+    fetchData();
+  }, [matriculaLocalStorage, path, setUser]);
 
   return (
     <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white">

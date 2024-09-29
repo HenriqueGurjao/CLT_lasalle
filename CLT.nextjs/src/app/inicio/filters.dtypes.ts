@@ -9,6 +9,16 @@ interface Tcc {
   curso: string;
 }
 
+export interface ProjetoFinal {
+  id: number;
+  titulo: string;
+  aluno_nome: string;
+  curso_nome: string;
+  orientador_nome: string;
+  data_registro: string;
+  status: string;
+}
+
 const moreTccs: Tcc[] = [
   {
     id: 6,

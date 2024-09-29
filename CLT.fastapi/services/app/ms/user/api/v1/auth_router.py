@@ -36,7 +36,10 @@ def login(request: LoginRequest, response: Response, req: Request):
             max_age=7 * 24 * 60 * 60, 
             expires=timedelta(days=7).total_seconds()
         )
-        return {"message": "Login successful", "token": user[0], "role": user[1], "refresh_token": user[2]}
+
+        is_acitve = usuario_repository.is_user_active(request.matricula)
+
+        return {"message": "Login successful", "token": user[0], "role": user[1], "refresh_token": user[2], "is_active": is_acitve}
     
     raise HTTPException(status_code=400, detail="Matricula ou senha incorretos")
 
@@ -46,6 +49,6 @@ def logout(response: Response):
     response.delete_cookie("refresh_token")
     return {"message": "Logout successful"}
 
-@router.post("/api/v1/auth/refresh", tags=["Autentificacao"])
+@router.post("/auth/refresh", tags=["Autentificacao"])
 async def refresh(request: Request):
     return refresh_token(request)

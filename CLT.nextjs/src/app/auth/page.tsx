@@ -22,9 +22,18 @@ import { Lock, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthForm } from "./forms/AuthSchema";
+import { useAuth } from "@/contexts/AuthProvider";
+import { CircleNotch } from "phosphor-react";
 
 export default function Auth() {
   const { form, onSubmit } = AuthForm();
+  const { loading } = useAuth();
+
+  if (loading) {
+    <div className="h-full w-full flex items-center justify-center">
+      <CircleNotch className="text-yellow-500 size-10 animate-spin" />
+    </div>;
+  }
 
   return (
     <section className=" h-full w-full flex justify-between items-center md:items-start gap-2">
@@ -96,32 +105,6 @@ export default function Auth() {
                 </Button>
               </form>
             </Form>
-            {/* <div className="relative">
-              <Input
-                type="number"
-                placeholder="Usuário"
-                className="pl-10"
-                value={login}
-                onChange={(event) => handleLoginChange(event)}
-              />
-              <Mail className="text-zinc-400 top-2 left-2 absolute" />
-            </div>
-            <div className="relative">
-              <Input
-                type="password"
-                placeholder="Senha"
-                className="pl-10"
-                value={password}
-                onChange={(event) => handlePasswordChange(event)}
-              />
-              <Lock className="text-zinc-400 top-2 left-2 absolute" />
-            </div>
-            <Button
-              onClick={(e) => handleSubmit(e)}
-              className="w-full bg-cyan-800"
-            >
-              Entrar
-            </Button> */}
           </CardContent>
         </Card>
       </div>

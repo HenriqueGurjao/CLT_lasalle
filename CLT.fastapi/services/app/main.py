@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from app.ms.user.api.v1.usuario_router import router as usuario_router
 from app.ms.user.api.v1.auth_router import router as auth_router
 from app.ms.course.api.v1.course_router import router as course_router
@@ -25,7 +25,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  
+    allow_origins=["*"],	  
     allow_credentials=True, 
     allow_methods=["*"],  
     allow_headers=["*"],  
@@ -33,13 +33,12 @@ app.add_middleware(
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
-
     try:
-        if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout"]:
+        if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout", "/api/v1/auth/refresh"] or request.method == "OPTIONS":
             try:
                 return await call_next(request)
             except Exception as e:
-                return JSONResponse(status_code=500, content={"detail": f"Erro ao verificar token: {e}"})
+                return JSONResponse(status_code=406, content={"detail": f"Erro ao verificar token: {e}"})
 
         token_encrypted = request.cookies.get("auth_token")
         
@@ -52,8 +51,8 @@ async def auth_middleware(request: Request, call_next):
             return JSONResponse(status_code=401, content={"detail": "Token inválido"})
 
         if isinstance(payload, dict):
-            if not is_user_active(payload, request) and request.url.path not in ["/api/v1/self/ativar_conta"]:
-                return JSONResponse(status_code=403, content={"detail": "Conta nao esta ativa"})
+            # if not is_user_active(payload, request) and request.url.path not in ["/api/v1/self/ativar_conta"]:
+            #     return JSONResponse(status_code=303, content={"detail": "Conta nao esta ativa"})
 
             has_permission = check_user_permissions(payload, request)
             if not has_permission:
@@ -67,8 +66,10 @@ async def auth_middleware(request: Request, call_next):
             if response is None:
                 return JSONResponse({"error": "No response"}, status_code=500)
             return response
+        return JSONResponse(status_code=401, content={"detail": "Token inválido"})
     except Exception as e:
-        return JSONResponse(status_code=401, content={"detail": f"Erro ao processar token: {e}"})
+        return Response(status_code=503, content={"detail": f"Erro ao processar token: {e}"})
+        raise JSONResponse(status_code=401, content={"detail": f"Erro ao processar token: {e}"})
             
 
 @app.on_event("startup")

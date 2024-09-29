@@ -6,6 +6,7 @@ import { z } from "zod";
 import fetchWithAuth from "@/utils/fetchWithAuth"; 
 import { useRouter } from "next/navigation"; 
 import { AuthFormSchema } from "@/app/auth/forms/AuthForms";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export function AuthForm() {
   const form = useForm<z.infer<typeof AuthFormSchema>>({
@@ -17,8 +18,11 @@ export function AuthForm() {
   });
 
   const router = useRouter(); 
+  const  { setMatricula, setRole, setIsActive } = useAuth();
 
   async function onSubmit(values: z.infer<typeof AuthFormSchema>) {
+
+
     try {
       const response = await fetchWithAuth("http://localhost:8000/api/v1/auth/login", {
         method: "POST",
@@ -29,7 +33,7 @@ export function AuthForm() {
         credentials: "include", 
       });
 
-      if (!response.ok) {
+      if (response && !response.ok) {
         if (response.status === 400) {
           alert("Senha inválida");
         } else if (response.status === 404) {
@@ -40,8 +44,12 @@ export function AuthForm() {
         return;
       }
 
-      const data = await response.json();
-      console.log(data); 
+      const data = response && await response.json();
+      setMatricula(values.matricula);
+      setRole(data.role);
+      setIsActive(data.is_active);
+      localStorage.setItem("matricula", values.matricula);
+      console.log(data)
 
       router.push("/inicio");
     } catch (error) {

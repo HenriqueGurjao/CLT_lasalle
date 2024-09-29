@@ -22,8 +22,9 @@ def login(request: LoginRequest, response: Response, req: Request):
             value=encrypt_token(user[0]),
             httponly=True, 
             samesite='Lax',  
-            secure=False,  
-            expires=3600  
+            secure=False, 
+            max_age=7 * 24 * 60 * 60, 
+            expires=7 * 24 * 60 * 60  
         )
 
         response.set_cookie(
@@ -31,7 +32,8 @@ def login(request: LoginRequest, response: Response, req: Request):
             value=encrypt_token(user[2]),
             httponly=True, 
             samesite='Lax',  
-            secure=False,  
+            secure=False, 
+            max_age=7 * 24 * 60 * 60, 
             expires=timedelta(days=7).total_seconds()
         )
         return {"message": "Login successful", "token": user[0], "role": user[1], "refresh_token": user[2]}

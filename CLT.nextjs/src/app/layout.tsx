@@ -6,6 +6,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { SideMenu } from "@/components/layout/SideMenu";
 import { LoggedMenu } from "./inicio/page";
+import { AuthProvider, useAuth } from "@/contexts/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -22,6 +25,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body
@@ -30,19 +34,23 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-        >
-          <div className="flex flex-col min-h-screen dark:bg-gray-900">
-            <Header />
-            <div className="flex flex-col h-[calc(100vh-3.5rem)] ">
-              {/* <SideMenu /> */}
-              <LoggedMenu/>
-              <main className="flex-1 mx-auto p-4 overflow-y-auto w-full">{children}</main>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+          >
+            <div className="flex flex-col min-h-screen dark:bg-gray-900">
+              <Header />
+              <div className="flex flex-col h-[calc(100vh-3.5rem)] ">
+                {/* <SideMenu /> */}
+                <LoggedMenu />
+                <main className="flex-1 mx-auto p-4 overflow-y-auto w-full">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

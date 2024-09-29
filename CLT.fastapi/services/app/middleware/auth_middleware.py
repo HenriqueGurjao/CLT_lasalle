@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 from app.core.security import verify_access_token, decrypt_token, create_access_token, create_refresh_token, encrypt_token
 from app.ms.user.services.usuario_services import UsuarioService
 from app.ms.user.repositories.usuario_repository import UsuarioRepository
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from jose import jwt
 
 def validate_token(token_encrypted: str, request: Request):
@@ -67,8 +67,25 @@ def refresh_token(request: Request):
             "access_token": new_access_token, 
             "refresh_token": new_refresh_token
         })
-        response.set_cookie(key="auth_token", value=encrypt_token(new_access_token), httponly=True)
-        response.set_cookie(key="refresh_token", value=encrypt_token(new_refresh_token), httponly=True)
+        response.set_cookie(
+            key="auth_token",
+            value=encrypt_token(new_access_token),
+            httponly=True, 
+            samesite='Lax',  
+            secure=False, 
+            max_age=7 * 24 * 60 * 60, 
+            expires=7 * 24 * 60 * 60  
+        )
+
+        response.set_cookie(
+            key="refresh_token",
+            value=encrypt_token(new_refresh_token),
+            httponly=True, 
+            samesite='Lax',  
+            secure=False, 
+            max_age=7 * 24 * 60 * 60, 
+            expires=timedelta(days=7).total_seconds()
+        )
         
         return response
 

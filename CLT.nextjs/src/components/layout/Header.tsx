@@ -1,14 +1,23 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AvatarMenu } from "./AvatarMenu";
 import Link from "next/link";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { MagnifyingGlass } from "phosphor-react";
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export const Header = () => {
   const path = usePathname();
+  const { loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    
+  }, []);
+
   return (
     <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white">
       <div className="pr-3 sm:pr-14 w-full flex justify-between items-center">

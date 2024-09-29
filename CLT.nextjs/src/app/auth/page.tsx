@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -8,58 +8,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Lock, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AuthForm } from "./forms/AuthSchema";
 
 export default function Auth() {
-
-  const [login, setLogin] = useState<number>();
-  const [password, setPassword] = useState<string>("");
-  const router = useRouter();
-
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ matricula: login, senha: password }),
-      });
-
-      if (!response.ok) {
-        response.status === 400 && alert('Senha inválida');
-        response.status === 404 && alert('Usuário não encontrado');
-        return;
-      }
-
-      const data = await response.json();
-      console.log(data)
-      localStorage.setItem('token', data.token);
-
-      router.push('/inicio');
-    } catch (error) {
-      alert('Erro interno no servidor'+ error);
-    }
-  };
-
-  const handlePasswordChange = (event: any) => {
-    setPassword(event.target.value);
-  }
-
-  const handleLoginChange = (event: any) => {
-    setLogin(event.target.value);
-  }
-
-  const submit = (event: any) => {
-    event.preventDefault();
-    // fazer a chamada para o backend para validar o login
-    router.push("/inicio")
-  }
+  const { form, onSubmit } = AuthForm();
 
   return (
     <section className=" h-full w-full flex justify-between items-center md:items-start gap-2">
@@ -78,7 +43,60 @@ export default function Auth() {
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="relative">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <FormField
+                  control={form.control}
+                  name="matricula"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Matricula"
+                            className="indent-6"
+                            {...field}
+                            type="number"
+                          />
+                          <Mail className="text-zinc-400 top-2 left-2 absolute" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="senha"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Senha"
+                            className="indent-6"
+                            {...field}
+                            type="password"
+                          />
+                          <Lock className="text-zinc-400 top-2 left-2 absolute" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full bg-cyan-800"
+                >
+                  Entrar
+                </Button>
+              </form>
+            </Form>
+            {/* <div className="relative">
               <Input
                 type="number"
                 placeholder="Usuário"
@@ -96,9 +114,14 @@ export default function Auth() {
                 value={password}
                 onChange={(event) => handlePasswordChange(event)}
               />
-              <Lock className="text-zinc-400 top-2 left-2 absolute" />  
+              <Lock className="text-zinc-400 top-2 left-2 absolute" />
             </div>
-            <Button onClick={(e) => handleSubmit(e)} className="w-full bg-cyan-800">Entrar</Button>
+            <Button
+              onClick={(e) => handleSubmit(e)}
+              className="w-full bg-cyan-800"
+            >
+              Entrar
+            </Button> */}
           </CardContent>
         </Card>
       </div>

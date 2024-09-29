@@ -36,7 +36,10 @@ async def auth_middleware(request: Request, call_next):
 
     try:
         if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout"]:
-            return await call_next(request)
+            try:
+                return await call_next(request)
+            except Exception as e:
+                return JSONResponse(status_code=500, content={"detail": f"Erro ao verificar token: {e}"})
 
         token_encrypted = request.cookies.get("auth_token")
         
@@ -44,6 +47,9 @@ async def auth_middleware(request: Request, call_next):
             return JSONResponse(status_code=401, content={"detail": "Usuario nao autenticado"})
 
         payload = validate_token(token_encrypted, request)
+
+        if payload is None:
+            return JSONResponse(status_code=401, content={"detail": "Token inválido"})
 
         if isinstance(payload, dict):
             if not is_user_active(payload, request) and request.url.path not in ["/api/v1/self/ativar_conta"]:

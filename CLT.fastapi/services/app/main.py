@@ -87,7 +87,7 @@ async def startup_event():
             admin = Professor(
                 departamento="Administração",
                 nome="Administrador",
-                matricula="admin",
+                matricula="00500",
                 email="prof.admin@example.com",
                 senha="admin123",
                 funcao="COORDENADOR", 

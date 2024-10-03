@@ -24,13 +24,12 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { ChevronDownIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon, CopyIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { FunnelSimple } from "phosphor-react";
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { tags, moreTccs, ProjetoFinal } from "./filters.dtypes";
+import { ProjetoFinal } from "./filters.dtypes";
 import {
   Card,
   CardContent,
@@ -43,35 +42,216 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import fetchWithAuth from "@/utils/fetchWithAuth";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const LoggedMenu = () => {
   const path = usePathname();
 
   return (
     <>
-      {
-        (path != "/auth" && path != "/" && (
-          <div className="w-ful border p-2">
-            <ul className="flex gap-3">
-              <li>
-                <Link
-                  className="hover:underline"
-                  href={"/meus-tcc"}
-                >
-                  Meus TCC
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="hover:underline"
-                  href={"/meus-tcc"}
-                >
-                  Catalogo
-                </Link>
-              </li>
-            </ul>
-          </div>
-        ))}
+      {path != "/auth" && path != "/" && (
+        <div className="w-ful border p-2 flex justify-between">
+          <ul className="flex gap-3">
+            <li>
+              <Link
+                className="hover:underline"
+                href={"/inicio"}
+              >
+                Catalogo
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="hover:underline"
+                href={"/meus-tcc"}
+              >
+                Meus TCC
+              </Link>
+            </li>
+          </ul>
+          <ul className="flex gap-3">
+            <li>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Cadastrar</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-3xl max-h-[70%] sm:max-h-[80%] ">
+                  <DialogHeader>
+                    <DialogTitle>Cadastrar</DialogTitle>
+                  </DialogHeader>
+                  <Tabs
+                    defaultValue="projeto"
+                    className="sm:max-w-3xl max-h-[70%] sm:max-h-[80%]"
+                  >
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="projeto">Projeto</TabsTrigger>
+                      <TabsTrigger value="professor">Professor</TabsTrigger>
+                      <TabsTrigger value="aluno">Aluno</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="projeto">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>projeto</CardTitle>
+                          <CardDescription>
+                            Cadastrar um novo projeto final
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2 max-h-[70%] sm:max-h-[80%] overflow-y-auto">
+                          <div className="space-y-1">
+                            <Label htmlFor="name">Name</Label>
+                            <Input
+                              id="name"
+                              defaultValue="Pedro Duarte"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="username">Username</Label>
+                            <Input
+                              id="username"
+                              defaultValue="@peduarte"
+                            />
+                          </div>
+                        </CardContent>
+                        <CardFooter>
+                          <Button>Save changes</Button>
+                        </CardFooter>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="professor" className=" max-h-[70%] sm:max-h-[80%] overflow-y-auto">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>professor</CardTitle>
+                          <CardDescription>
+                            Change your professor here. After saving, you'll be
+                            logged out.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2 max-h-[70%] sm:max-h-[80%] overflow-y-auto">
+                          <div className="space-y-1">
+                            <Label htmlFor="current">Current professor</Label>
+                            <Input
+                              id="current"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="new">New professor</Label>
+                            <Input
+                              id="new"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="current">Current professor</Label>
+                            <Input
+                              id="current"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="new">New professor</Label>
+                            <Input
+                              id="new"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="current">Current professor</Label>
+                            <Input
+                              id="current"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="new">New professor</Label>
+                            <Input
+                              id="new"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="current">Current professor</Label>
+                            <Input
+                              id="current"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="new">New professor</Label>
+                            <Input
+                              id="new"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="current">Current professor</Label>
+                            <Input
+                              id="current"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="new">New professor</Label>
+                            <Input
+                              id="new"
+                              type="professor"
+                            />
+                          </div>
+                        </CardContent>
+                        <CardFooter>
+                          <Button>Cadastrar</Button>
+                        </CardFooter>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="aluno">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>professor</CardTitle>
+                          <CardDescription>
+                            Change your professor here. After saving, you'll be
+                            logged out.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <div className="space-y-1">
+                            <Label htmlFor="current">Current professor</Label>
+                            <Input
+                              id="current"
+                              type="professor"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="new">New professor</Label>
+                            <Input
+                              id="new"
+                              type="professor"
+                            />
+                          </div>
+                        </CardContent>
+                        <CardFooter>
+                          <Button>Save professor</Button>
+                        </CardFooter>
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
+                </DialogContent>
+              </Dialog>
+            </li>
+          </ul>
+        </div>
+      )}
     </>
   );
 };
@@ -103,23 +283,39 @@ interface FilterProps {
 const Filters = () => {
   const [selectedTags, setSelectedTags] = React.useState<FilterProps[]>([]);
   const [selectedCursos, setSelectedCursos] = React.useState<FilterProps[]>([]);
-  const [selectedPeriods, setSelectedPeriods] = React.useState<FilterProps[]>([]);
+  const [selectedPeriods, setSelectedPeriods] = React.useState<FilterProps[]>(
+    []
+  );
   const [cursos, setCursos] = React.useState<FilterProps[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCursoData = async () => {
       try {
-        const response = await fetchWithAuth("http://localhost:8000/api/v1/cursos/resumido");
+        const response = await fetchWithAuth(
+          "http://localhost:8000/api/v1/cursos/resumido"
+        );
+
+        const data = await response?.json();
+        setCursos(data);
+      } catch (error) {
+        console.error("Error fetching cursos:", error);
+      }
+    };
+    const fetchTagsData = async () => {
+      try {
+        const response = await fetchWithAuth(
+          "http://localhost:8000/api/v1/cursos/resumido"
+        );
 
         // Atualize seu estado de cursos, se necessário
         const data = await response?.json();
-        setCursos(data); 
+        setCursos(data);
       } catch (error) {
         console.error("Error fetching cursos:", error);
       }
     };
 
-    fetchData();
+    fetchCursoData();
   }, []);
 
   const handleRemoveFilter = (
@@ -129,7 +325,9 @@ const Filters = () => {
     if (type === "tag") {
       setSelectedTags((tags) => tags.filter((t) => t.id !== filter.id));
     } else if (type === "year") {
-      setSelectedPeriods((periods) => periods.filter((p) => p.id !== filter.id)); // Supondo que os períodos também são FilterProps
+      setSelectedPeriods((periods) =>
+        periods.filter((p) => p.id !== filter.id)
+      ); // Supondo que os períodos também são FilterProps
     } else {
       setSelectedCursos((cursos) => cursos.filter((c) => c.id !== filter.id));
     }
@@ -142,28 +340,33 @@ const Filters = () => {
           Filtros
         </span>
         <ul className="flex gap-1 border p-1 w-full min-h-10 flex-wrap">
-          {[...selectedTags, ...selectedCursos, ...selectedPeriods].map((filter) => (
-            <li key={filter.id} className="relative select-none">
-              <Button
-                onClick={() =>
-                  handleRemoveFilter(
-                    filter,
-                    selectedTags.includes(filter)
-                      ? "tag"
-                      : selectedCursos.includes(filter)
-                      ? "curso"
-                      : "year"
-                  )
-                }
-                className="absolute w-3 h-3 p-0 right-0 bg-yellow-500 hover:bg-yellow-700"
+          {[...selectedTags, ...selectedCursos, ...selectedPeriods].map(
+            (filter) => (
+              <li
+                key={filter.id}
+                className="relative select-none"
               >
-                <XIcon size={10} />
-              </Button>
-              <Badge className="bg-blue-900 hover:bg-blue-800 whitespace-nowrap">
-                {filter.nome} {/* Usando a propriedade 'nome' do FilterProps */}
-              </Badge>
-            </li>
-          ))}
+                <Button
+                  onClick={() =>
+                    handleRemoveFilter(
+                      filter,
+                      selectedTags.includes(filter)
+                        ? "tag"
+                        : selectedCursos.includes(filter)
+                        ? "curso"
+                        : "year"
+                    )
+                  }
+                  className="absolute w-3 h-3 p-0 right-0 bg-yellow-500 hover:bg-yellow-700"
+                >
+                  <XIcon size={10} />
+                </Button>
+                <Badge className="bg-blue-900 hover:bg-blue-800 whitespace-nowrap">
+                  {filter.nome}
+                </Badge>
+              </li>
+            )
+          )}
         </ul>
       </div>
       <div className="absolute right-0 top-0">
@@ -187,13 +390,15 @@ const Filters = () => {
             /> */}
             <DropdownFilterGroup
               label={"Cursos"}
-              options={cursos} // Certifique-se de que 'cursos' é um array de FilterProps
+              options={cursos}
               selected={selectedCursos}
               setSelected={setSelectedCursos}
             />
             <DropdownFilterGroup
               label="Ano"
-              options={years.toReversed().map((year) => ({ nome: year.toString(), id: year }))} // Atualize para usar FilterProps
+              options={years
+                .toReversed()
+                .map((year) => ({ nome: year.toString(), id: year }))}
               selected={selectedPeriods}
               setSelected={setSelectedPeriods}
             />
@@ -204,10 +409,9 @@ const Filters = () => {
   );
 };
 
-
 interface DropdownFilterGroupProps {
   label: string;
-  options: FilterProps[]; 
+  options: FilterProps[];
   selected: FilterProps[];
   setSelected: React.Dispatch<React.SetStateAction<FilterProps[]>>;
 }
@@ -244,14 +448,20 @@ const DropdownFilterGroup = ({
                 <CommandEmpty>Sem resultados.</CommandEmpty>
                 <CommandGroup>
                   {options
-                    .filter((option) => !selected.some((selectedOption) => selectedOption.id === option.id))
+                    .filter(
+                      (option) =>
+                        !selected.some(
+                          (selectedOption) => selectedOption.id === option.id
+                        )
+                    )
                     .map((option) => (
                       <CommandItem
                         key={option.id} // Use o ID para a chave
                         value={option.nome} // Use o nome ou outro identificador relevante
                         onSelect={() => handleSelect(option)} // Passe o objeto FilterProps
                       >
-                        {option.nome} {/* Renderize o nome ou outro atributo relevante */}
+                        {option.nome}{" "}
+                        {/* Renderize o nome ou outro atributo relevante */}
                       </CommandItem>
                     ))}
                 </CommandGroup>
@@ -263,7 +473,6 @@ const DropdownFilterGroup = ({
     </DropdownMenuGroup>
   );
 };
-
 
 const ListTccs = () => {
   const [flipped, setFlipped] = useState<number | null>(null);
@@ -278,33 +487,35 @@ const ListTccs = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchWithAuth("http://localhost:8000/api/v1/projetos");
+        const response = await fetchWithAuth(
+          "http://localhost:8000/api/v1/projetos"
+        );
         const data = await response?.json();
 
         setProjetos(data);
       } catch (error) {
         console.error("Error fetching tccs:", error);
       }
-    }
-    
+    };
+
     fetchData();
-  }, [])
+  }, []);
 
   return (
     <ul className="border p-4 grid grid-cols-4 gap-2">
-      {projetos ? projetos.map((tcc, index) => (
-        <li key={index}>
-          <Card className="min-h-full flex flex-col justify-between pb-2 ">
-            <CardHeader className="h-28 overflow-y-auto">
-              <CardTitle>{tcc.titulo}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center bg-[url('/Untitled.jpg')] h-72 bg-cover bg-center border">
-            </CardContent>
-            <CardFooter className="flex items-center justify-center gap-2 pt-5">
-              <Button>Download</Button>
-              <Button>Informações</Button>
-            </CardFooter>
-            {/* <CardFooter className="overflow-x-auto max-h-20 p-4">
+      {projetos ? (
+        projetos.map((tcc, index) => (
+          <li key={index}>
+            <Card className="min-h-full flex flex-col justify-between pb-2 ">
+              <CardHeader className="h-28 overflow-y-auto">
+                <CardTitle>{tcc.titulo}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center bg-[url('/Untitled.jpg')] h-72 bg-cover bg-center border"></CardContent>
+              <CardFooter className="flex items-center justify-center gap-2 pt-5">
+                <Button>Download</Button>
+                <Button>Informações</Button>
+              </CardFooter>
+              {/* <CardFooter className="overflow-x-auto max-h-20 p-4">
               <ul>
                 <li>
                   <span className="font-bold">Ano:</span>
@@ -324,12 +535,11 @@ const ListTccs = () => {
                 </li>
               </ul>
             </CardFooter> */}
-          </Card>
-        </li>
-      )) : (
-        <div>
-          carregando
-        </div>
+            </Card>
+          </li>
+        ))
+      ) : (
+        <div>carregando</div>
       )}
     </ul>
   );

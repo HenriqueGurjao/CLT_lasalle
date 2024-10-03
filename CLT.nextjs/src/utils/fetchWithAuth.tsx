@@ -1,5 +1,6 @@
 "use client"
 
+
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
 
   try {

@@ -18,16 +18,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Lock, Mail } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Eye, Lock, Mail } from "lucide-react";
 import { AuthForm } from "./forms/AuthSchema";
 import { useAuth } from "@/contexts/AuthProvider";
-import { CircleNotch } from "phosphor-react";
+import { CircleNotch, EyeClosed } from "phosphor-react";
+import { useState } from "react";
 
 export default function Auth() {
   const { form, onSubmit } = AuthForm();
   const { loading } = useAuth();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   if (loading) {
     <div className="h-full w-full flex items-center justify-center">
@@ -55,7 +55,7 @@ export default function Auth() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
+                className="space-y-4"
               >
                 <FormField
                   control={form.control}
@@ -69,6 +69,7 @@ export default function Auth() {
                             className="indent-6"
                             {...field}
                             type="number"
+                            name="matricula"
                           />
                           <Mail className="text-zinc-400 top-2 left-2 absolute" />
                         </div>
@@ -88,9 +89,21 @@ export default function Auth() {
                             placeholder="Senha"
                             className="indent-6"
                             {...field}
-                            type="password"
+                            type={showPassword === false ? "password" : "text"}
                           />
                           <Lock className="text-zinc-400 top-2 left-2 absolute" />
+                          <Button
+                            type="button"
+                            variant={"outline"}
+                            onClick={() => setShowPassword(!showPassword)}  
+                            className="text-zinc-400 bg-zinc-100 top-0 right-0 absolute flex items-center justify-center"
+                          >
+                            {showPassword ? (
+                              <Eye className="size-4" />
+                            ) : (
+                              <EyeClosed className="size-4" />
+                            )}
+                          </Button>
                         </div>
                       </FormControl>
                       <FormMessage />

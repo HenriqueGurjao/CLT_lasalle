@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { SideMenu } from "@/components/layout/SideMenu";
-import { LoggedMenu } from "./inicio/page";
 import { AuthProvider, useAuth } from "@/contexts/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { LoggedMenu } from "../components/layout/LoggedMenu";
 
 const fontSans = FontSans({
   subsets: ["latin"],

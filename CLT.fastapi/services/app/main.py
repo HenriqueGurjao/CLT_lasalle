@@ -78,21 +78,22 @@ async def startup_event():
     usuario_service = UsuarioService(usuario_repository)  
     
     try:
-        admin = usuario_service.get_user_by_matricula('admin')  # Busca pelo admin
+        admin = usuario_service.get_user_by_matricula('00500500')  # Busca pelo admin
     except:
         admin = None
 
+    print(admin)
     if admin is None:
         if not usuario_repository.usuario_existe("prof.admin@example.com"):
             admin = Professor(
                 departamento="Administração",
                 nome="Administrador",
-                matricula="00500",
+                matricula="00500500",
                 email="prof.admin@example.com",
                 senha="admin123",
                 funcao="COORDENADOR", 
                 ativo=True,   
-                titulacao="ADMIN"
+                titulacao="ADMIN" 
             )
             usuario_service.registrar_professor(admin)  
           

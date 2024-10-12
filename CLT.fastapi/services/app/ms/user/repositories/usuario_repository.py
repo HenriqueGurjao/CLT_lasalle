@@ -75,9 +75,9 @@ class UsuarioRepository:
             try:
                 with conn.cursor() as cursor:
                     cursor.execute("""
-                        INSERT INTO CLT_LASALLE.alunos (usuario_id, periodo)
-                        VALUES (%s, %s)
-                    """, (usuario_id, aluno.periodo))
+                        INSERT INTO CLT_LASALLE.alunos (usuario_id, periodo, status)
+                        VALUES (%s, %s, %s)
+                    """, (usuario_id, aluno.periodo, aluno.status.value))
                     conn.commit()
             except Exception as e:
                 conn.rollback()  

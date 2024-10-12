@@ -1,5 +1,11 @@
 from pydantic import BaseModel, EmailStr
+from enum import Enum
 
+class Status(str, Enum):
+    CURSANDO = "CURSANDO"
+    TRANCADO = "TRANCADO"
+    CONCLUIDO = "CONCLUIDO" 
+    
 class Usuario(BaseModel):
     email: EmailStr
     nome: str
@@ -9,6 +15,7 @@ class Usuario(BaseModel):
 
 class Aluno(Usuario):
     periodo: str  
+    status: Status
     curso: str 
     
 

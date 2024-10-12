@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Eye, Lock, Mail } from "lucide-react";
+import { CircleNotch, EyeClosed } from "phosphor-react";
 import { AuthForm } from "./forms/AuthSchema";
 import { useAuth } from "@/contexts/AuthProvider";
-import { CircleNotch, EyeClosed } from "phosphor-react";
 import { useState } from "react";
 
 export default function Auth() {

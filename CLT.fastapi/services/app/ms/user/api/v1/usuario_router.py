@@ -11,6 +11,7 @@ def get_usuario_service() -> UsuarioService:
 
 @router.post("/coordenador/alunos", tags=["Coordenador"])
 def criar_aluno(aluno: Aluno, usuario_service: UsuarioService = Depends(get_usuario_service)):
+    print(aluno)
     try:
         usuario_service.registrar_aluno(aluno)
         return {"msg": "Aluno criado com sucesso"}

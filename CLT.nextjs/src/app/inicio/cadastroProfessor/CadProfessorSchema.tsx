@@ -4,32 +4,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import fetchWithAuth from "@/utils/fetchWithAuth"; 
-import { CadStudentFormSchema, Status } from "./CadFormsSchema";
+import { CadTeacherFormSchema, Status } from "./CadFormsSchema";
 import { toast } from "@/hooks/use-toast";
 
-export type FormSchemaType = z.infer<typeof CadStudentFormSchema>;
+export type FormSchemaType = z.infer<typeof CadTeacherFormSchema>;
 
-export function CadStudentForm() {
-  const form = useForm<z.infer<typeof CadStudentFormSchema>>({
-    resolver: zodResolver(CadStudentFormSchema),
+export function CadProfessorForm() {
+  const form = useForm<z.infer<typeof CadTeacherFormSchema>>({
+    resolver: zodResolver(CadTeacherFormSchema),
     defaultValues: {
       matricula: "",
       senha: "",
       curso: "",
       email: "",
       nome: "",
-      status: Status.CURSANDO,	
+      status: Status.PROFESSOR,	
       ativo: false,
-      periodo: "",
+      departamento: "",
+      funcao: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof CadStudentFormSchema>) {
+  async function onSubmit(values: z.infer<typeof CadTeacherFormSchema>) {
 
     console.log(JSON.stringify(values))
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/coordenador/alunos", {
+      const response = await fetch("http://localhost:8000/api/v1/coordenador/professores/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

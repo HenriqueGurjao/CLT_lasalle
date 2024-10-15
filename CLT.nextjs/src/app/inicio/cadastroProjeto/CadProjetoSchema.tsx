@@ -4,32 +4,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import fetchWithAuth from "@/utils/fetchWithAuth"; 
-import { CadStudentFormSchema, Status } from "./CadFormsSchema";
+import { CadProjetoFormSchema, Status } from "./CadFormsSchema";
 import { toast } from "@/hooks/use-toast";
 
-export type FormSchemaType = z.infer<typeof CadStudentFormSchema>;
+export type FormSchemaType = z.infer<typeof CadProjetoFormSchema>;
 
-export function CadStudentForm() {
-  const form = useForm<z.infer<typeof CadStudentFormSchema>>({
-    resolver: zodResolver(CadStudentFormSchema),
+export function CadProjetoForm() {
+  const form = useForm<z.infer<typeof CadProjetoFormSchema>>({
+    resolver: zodResolver(CadProjetoFormSchema),
     defaultValues: {
-      matricula: "",
-      senha: "",
-      curso: "",
-      email: "",
-      nome: "",
-      status: Status.CURSANDO,	
-      ativo: false,
-      periodo: "",
+      aluno_matr: "",
+      curso_id: "",
+      orientador_matr: "",
+      status:  Status.EM_DESENVOLVIMENTO,
+      titulo: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof CadStudentFormSchema>) {
+  async function onSubmit(values: z.infer<typeof CadProjetoFormSchema>) {
 
     console.log(JSON.stringify(values))
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/coordenador/alunos", {
+      const response = await fetch("http://localhost:8000/api/v1/professor/projeto-final", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +48,7 @@ export function CadStudentForm() {
       console.log(data);
 
       toast({
-        title: "Aluno cadastrado com sucesso!",
+        title: "Projeto cadastrado com sucesso!",
       })
     } catch (error) {
       toast({

@@ -1,12 +1,29 @@
-"use client"
+"use client";
 
+import { CadCursoFormFields } from "@/app/inicio/cadastrarCurso/CadCursoFormFields";
 import { CadAlunoFormFields } from "@/app/inicio/cadastroAluno/CadAlunoFormFields";
+import { CadProfessorFormFields } from "@/app/inicio/cadastroProfessor/CadProfessorFormFields";
+import { CadProjetoFormFields } from "@/app/inicio/cadastroProjeto/CadProjetoFormFields";
 import { Button } from "@/components/ui/button";
-import { CardTitle, CardDescription, CardFooter, Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  CardTitle,
+  CardDescription,
+  CardFooter,
+  Card,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/AuthProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -14,6 +31,9 @@ import React from "react";
 export const LoggedMenu = () => {
   const path = usePathname();
 
+  const { role } = useAuth();
+
+  console.log(role);
   return (
     <>
       {path != "/auth" && path != "/" && (
@@ -42,110 +62,38 @@ export const LoggedMenu = () => {
                 <DialogTrigger asChild>
                   <Button variant="outline">Cadastrar</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-3xl max-h-[70%] sm:max-h-[80%] ">
+                <DialogContent className="sm:max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>Cadastrar</DialogTitle>
                   </DialogHeader>
                   <Tabs
                     defaultValue="projeto"
-                    className="sm:max-w-3xl max-h-[70%] sm:max-h-[80%]"
+                    className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
                   >
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="projeto">Projeto</TabsTrigger>
-                      <TabsTrigger value="professor">Professor</TabsTrigger>
-                      <TabsTrigger value="aluno">Aluno</TabsTrigger>
+                    <TabsList className={`"flex w-full ${role === 'COORDENADOR' ? 'grid-cols-5' : 'grid-cols-1'}"`}>
+                      {role === "COORDENADOR" && (
+                        <>
+                        </>
+                      )}
+                      <TabsTrigger className="w-full" value="projeto">Projeto</TabsTrigger>
+                      <TabsTrigger className="w-full" value="professor">Professor</TabsTrigger>
+                      <TabsTrigger className="w-full" value="curso">Curso</TabsTrigger>
+                      <TabsTrigger className="w-full" value="aluno">Aluno</TabsTrigger>
                     </TabsList>
                     <TabsContent value="projeto">
-                      <CadAlunoFormFields/>
+                      <CadProjetoFormFields/>
                     </TabsContent>
-                    <TabsContent value="professor" className=" max-h-[70%] sm:max-h-[80%] overflow-y-auto">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>professor</CardTitle>
-                          <CardDescription>
-                            Change your professor here. After saving, you'll be
-                            logged out.
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-2 max-h-[70%] sm:max-h-[80%] overflow-y-auto">
-                          <div className="space-y-1">
-                            <Label htmlFor="current">Current professor</Label>
-                            <Input
-                              id="current"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="new">New professor</Label>
-                            <Input
-                              id="new"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="current">Current professor</Label>
-                            <Input
-                              id="current"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="new">New professor</Label>
-                            <Input
-                              id="new"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="current">Current professor</Label>
-                            <Input
-                              id="current"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="new">New professor</Label>
-                            <Input
-                              id="new"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="current">Current professor</Label>
-                            <Input
-                              id="current"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="new">New professor</Label>
-                            <Input
-                              id="new"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="current">Current professor</Label>
-                            <Input
-                              id="current"
-                              type="professor"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="new">New professor</Label>
-                            <Input
-                              id="new"
-                              type="professor"
-                            />
-                          </div>
-                        </CardContent>
-                        <CardFooter>
-                          <Button>Cadastrar</Button>
-                        </CardFooter>
-                      </Card>
+                    <TabsContent
+                      value="professor"
+                      className=" pb-1 overflow-y-auto"
+                    >
+                      <CadProfessorFormFields />
                     </TabsContent>
                     <TabsContent value="aluno">
-                      <CadAlunoFormFields/>
+                      <CadAlunoFormFields />
+                    </TabsContent>
+                    <TabsContent value="curso">
+                      <CadCursoFormFields />
                     </TabsContent>
                   </Tabs>
                 </DialogContent>

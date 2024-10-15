@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CadStudentForm } from "./CadAlunoSchema";
 import {
   Select,
   SelectContent,
@@ -28,9 +27,10 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import fetchWithAuth from "@/utils/fetchWithAuth";
-import { Status } from "./CadFormsSchema";
-import { Eye, Lock, Mail } from "lucide-react";
-import { CircleNotch, EyeClosed } from "phosphor-react";
+import { CadProjetoFormSchema, Status } from "./CadFormsSchema";
+import { CadProjetoForm } from "./CadProjetoSchema";
+import { PlusCircle } from "lucide-react";
+import { MinusCircle } from "phosphor-react";
 
 interface Curso {
   id: number;
@@ -39,17 +39,37 @@ interface Curso {
   descricao: string;
 }
 
-export const CadAlunoFormFields = () => {
-  const { form, onSubmit } = CadStudentForm();
+export const CadProjetoFormFields = () => {
+  const { form, onSubmit } = CadProjetoForm();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [periodos, setPeriodos] = useState<number>(1);
   const [cursoSelecionado, setCursoSelecionado] = useState<number | null>(null);
-  const [statusPermitidos, setStatusPermitidos] = useState<string[]>([]);
-  
+  const statusPermitidos = Object.values(Status);
+  const [tags, setTags] = useState<
+    { titulo: string; area_envolvida: string }[]
+  >([]);
+
+  const addTag = () => {
+    setTags([...tags, { titulo: "", area_envolvida: "" }]);
+  };
+
+  const removeTag = (index: number) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
+
+  const updateTag = (
+    index: number,
+    field: keyof { titulo: string; area_envolvida: string },
+    value: string
+  ) => {
+    const updatedTags = [...tags];
+    updatedTags[index][field] = value;
+    setTags(updatedTags);
+    form.setValue("tags", updatedTags);
+  };
+
   useEffect(() => {
-    const status = Object.values(Status);
-    setStatusPermitidos(status);
     async function fetchCursos() {
       try {
         const response = await fetchWithAuth(
@@ -74,13 +94,14 @@ export const CadAlunoFormFields = () => {
     } else {
       setPeriodos(1);
     }
-    form.setValue("curso", value);
+    form.setValue("curso_id", value);
   };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Aluno</CardTitle>
-        <CardDescription>Cadastrar um novo aluno</CardDescription>
+        <CardTitle>Projeto</CardTitle>
+        <CardDescription>Cadastrar um novo Projeto</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 max-h-[70%] sm:max-h-[80%] overflow-y-auto">
         <Form {...form}>
@@ -90,17 +111,37 @@ export const CadAlunoFormFields = () => {
           >
             <FormField
               control={form.control}
-              name="matricula"
+              name="titulo"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="Matricula"
+                        placeholder="Titulo"
+                        className="mt-1"
+                        {...field}
+                        type="text"
+                        name="titulo"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="aluno_matr"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        placeholder="Matricula Aluno"
                         className="mt-1"
                         {...field}
                         type="number"
-                        name="matricula"
+                        name="matr_aluno"
                       />
                     </div>
                   </FormControl>
@@ -110,70 +151,18 @@ export const CadAlunoFormFields = () => {
             />
             <FormField
               control={form.control}
-              name="nome"
+              name="orientador_matr"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="Nome Completo"
+                        placeholder="Matricula Orientador"
                         className=""
                         {...field}
-                        type="text"
-                        name="nome"
+                        type="number"
+                        name="matr_orientador"
                       />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        placeholder="email"
-                        className=""
-                        {...field}
-                        type="email"
-                        name="email"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="senha"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        placeholder="Senha"
-                        className="indent-6"
-                        {...field}
-                        type={showPassword === false ? "password" : "text"}
-                      />
-                      <Lock className="text-zinc-400 top-2 left-2 absolute" />
-                      <Button
-                        type="button"
-                        variant={"outline"}
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="text-zinc-400 bg-zinc-100 top-0 right-0 absolute flex items-center justify-center"
-                      >
-                        {showPassword ? (
-                          <Eye className="size-4" />
-                        ) : (
-                          <EyeClosed className="size-4" />
-                        )}
-                      </Button>
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -183,7 +172,7 @@ export const CadAlunoFormFields = () => {
             <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
-                name="curso"
+                name="curso_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -203,38 +192,6 @@ export const CadAlunoFormFields = () => {
                                 value={String(curso.id)}
                               >
                                 {curso.nome}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="periodo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Período" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Períodos</SelectLabel>
-                            {Array.from({ length: periodos }, (_, index) => (
-                              <SelectItem
-                                key={index + 1}
-                                value={String(index + 1)}
-                              >
-                                {index + 1}
                               </SelectItem>
                             ))}
                           </SelectGroup>
@@ -277,6 +234,46 @@ export const CadAlunoFormFields = () => {
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="space-y-2 max-h-56 overflow-y-auto">
+              <div className="flex items-center gap-2">
+                <Label>Tags</Label>
+                <Button
+                  type="button"
+                  onClick={addTag}
+                  variant={"outline"}
+                  className="rounded-full p-0 px-2"
+                >
+                  <PlusCircle size={24} />
+                </Button>
+              </div>
+              {tags.map((tag, index) => (
+                <div
+                  key={index}
+                  className="flex space-x-2"
+                >
+                  <Input
+                    placeholder="Título"
+                    value={tag.titulo}
+                    onChange={(e) => updateTag(index, "titulo", e.target.value)}
+                  />
+                  <Input
+                    placeholder="Área Envolvida"
+                    value={tag.area_envolvida}
+                    onChange={(e) =>
+                      updateTag(index, "area_envolvida", e.target.value)
+                    }
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => removeTag(index)}
+                    variant={"outline"}
+                    className="rounded-full p-0 px-2"
+                  >
+                    <MinusCircle size={24} />
+                  </Button>
+                </div>
+              ))}
             </div>
             <Button
               type="submit"

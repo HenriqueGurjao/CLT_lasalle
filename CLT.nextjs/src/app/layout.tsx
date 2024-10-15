@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { LoggedMenu } from "../components/layout/LoggedMenu";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -49,6 +50,7 @@ export default function RootLayout({
                 </main>
               </div>
             </div>
+            <Toaster/>
           </ThemeProvider>
         </AuthProvider>
       </body>

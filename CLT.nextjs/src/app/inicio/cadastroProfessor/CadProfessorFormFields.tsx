@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CadStudentForm } from "./CadAlunoSchema";
+import { CadProfessorForm } from "./CadProfessorSchema";
 import {
   Select,
   SelectContent,
@@ -28,9 +28,12 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import fetchWithAuth from "@/utils/fetchWithAuth";
-import { Status } from "./CadFormsSchema";
+import { CadTeacherFormSchema, Status, Titulacao } from "./CadFormsSchema";
 import { Eye, Lock, Mail } from "lucide-react";
 import { CircleNotch, EyeClosed } from "phosphor-react";
+import { useToast } from "@/hooks/use-toast";
+import { generateFormConfig } from "@/utils/generateFormConfig";
+import DynamicForm from "@/utils/DynamicForms";
 
 interface Curso {
   id: number;
@@ -39,17 +42,16 @@ interface Curso {
   descricao: string;
 }
 
-export const CadAlunoFormFields = () => {
-  const { form, onSubmit } = CadStudentForm();
+export const CadProfessorFormFields = () => {
+  const { form, onSubmit } = CadProfessorForm();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [periodos, setPeriodos] = useState<number>(1);
   const [cursoSelecionado, setCursoSelecionado] = useState<number | null>(null);
-  const [statusPermitidos, setStatusPermitidos] = useState<string[]>([]);
-  
+  const statusPermitidos = Object.values(Status);
+  const Titulacoes = Object.values(Titulacao);
+
   useEffect(() => {
-    const status = Object.values(Status);
-    setStatusPermitidos(status);
     async function fetchCursos() {
       try {
         const response = await fetchWithAuth(
@@ -76,11 +78,12 @@ export const CadAlunoFormFields = () => {
     }
     form.setValue("curso", value);
   };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Aluno</CardTitle>
-        <CardDescription>Cadastrar um novo aluno</CardDescription>
+        <CardTitle>Professor</CardTitle>
+        <CardDescription>Cadastrar um novo professor</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 max-h-[70%] sm:max-h-[80%] overflow-y-auto">
         <Form {...form}>
@@ -180,6 +183,58 @@ export const CadAlunoFormFields = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="departamento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        placeholder="Departamento"
+                        className=""
+                        {...field}
+                        type="text"
+                        name="departamento"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="titulacao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Titulação" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Titulação</SelectLabel>
+                          {Titulacoes.map((titulacao) => (
+                            <SelectItem
+                              key={titulacao}
+                              value={titulacao}
+                            >
+                              {titulacao}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -215,7 +270,7 @@ export const CadAlunoFormFields = () => {
               />
               <FormField
                 control={form.control}
-                name="periodo"
+                name="funcao"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -224,43 +279,11 @@ export const CadAlunoFormFields = () => {
                         value={field.value}
                       >
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Período" />
+                          <SelectValue placeholder="Função" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>Períodos</SelectLabel>
-                            {Array.from({ length: periodos }, (_, index) => (
-                              <SelectItem
-                                key={index + 1}
-                                value={String(index + 1)}
-                              >
-                                {index + 1}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Status</SelectLabel>
+                            <SelectLabel>Função</SelectLabel>
                             {statusPermitidos.map((status) => (
                               <SelectItem
                                 key={status}

@@ -9,6 +9,7 @@ import { MagnifyingGlass } from "phosphor-react";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import fetchWithAuth from "@/utils/fetchWithAuth";
+import Image from "next/image";
 
 export const Header = () => {
   const path = usePathname();
@@ -46,7 +47,12 @@ export const Header = () => {
     <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white">
       <div className="pr-3 sm:pr-14 w-full flex justify-between items-center">
         <h1 className="text-3xl font-bold text-yellow-400 dark:text-white px-6">
-          CLT(Logo)
+        <Image
+          src="/imagem/logo/Central Lasalle de TCCs/WordPress/wordpress_logo_transparent_512x512.png"
+          alt="imagem tela de login" 
+          width={300}   
+          height={300} 
+        />
         </h1>
         {/* <ul>
           <li className=" flex gap-5 font-bold">

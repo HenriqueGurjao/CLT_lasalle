@@ -38,7 +38,7 @@ export const LoggedMenu = () => {
     <>
       {path != "/auth" && path != "/" && (
         <div className="w-ful border p-2 flex justify-between">
-          <ul className="flex gap-3">
+          <ul className="flex gap-3 items-center">
             <li>
               <Link
                 className="hover:underline"
@@ -50,9 +50,17 @@ export const LoggedMenu = () => {
             <li>
               <Link
                 className="hover:underline"
-                href={"/meus-tcc"}
+                href={"/meus-projetos"}
               >
-                Meus TCC
+                Meus projetos
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="hover:underline"
+                href={"/gerenciar-projetos"}
+              >
+                Gerenciar Projetos
               </Link>
             </li>
           </ul>
@@ -70,18 +78,39 @@ export const LoggedMenu = () => {
                     defaultValue="projeto"
                     className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
                   >
-                    <TabsList className={`"flex w-full ${role === 'COORDENADOR' ? 'grid-cols-5' : 'grid-cols-1'}"`}>
-                      {role === "COORDENADOR" && (
-                        <>
-                        </>
-                      )}
-                      <TabsTrigger className="w-full" value="projeto">Projeto</TabsTrigger>
-                      <TabsTrigger className="w-full" value="professor">Professor</TabsTrigger>
-                      <TabsTrigger className="w-full" value="curso">Curso</TabsTrigger>
-                      <TabsTrigger className="w-full" value="aluno">Aluno</TabsTrigger>
+                    <TabsList
+                      className={`"flex w-full ${
+                        role === "COORDENADOR" ? "grid-cols-5" : "grid-cols-1"
+                      }"`}
+                    >
+                      {role === "COORDENADOR" && <></>}
+                      <TabsTrigger
+                        className="w-full"
+                        value="projeto"
+                      >
+                        Projeto
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="w-full"
+                        value="professor"
+                      >
+                        Professor
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="w-full"
+                        value="curso"
+                      >
+                        Curso
+                      </TabsTrigger>
+                      <TabsTrigger
+                        className="w-full"
+                        value="aluno"
+                      >
+                        Aluno
+                      </TabsTrigger>
                     </TabsList>
                     <TabsContent value="projeto">
-                      <CadProjetoFormFields/>
+                      <CadProjetoFormFields />
                     </TabsContent>
                     <TabsContent
                       value="professor"

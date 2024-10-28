@@ -4,19 +4,36 @@ from app.ms.final_paper.repositories.projeto_final_repository import ProjetoFina
 from app.ms.final_paper.repositories.tag_repository import TagRepository 
 from app.ms.final_paper.services.tag_service import TagService
 from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, ProjetoFinalCreateSchema
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
+from ....user.services.usuario_services import UsuarioRepository, UsuarioService
 
 router = APIRouter()
+
+def get_usuario_service() -> UsuarioService:
+    usuario_repository = UsuarioRepository()
+    return UsuarioService(usuario_repository)
 
 projeto_service = ProjetoFinalService(ProjetoFinalRepository(), TagService(TagRepository()))
 
 @router.post("/professor/projeto-final", tags=["Projeto_final"])
-async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema):
+async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_service: UsuarioService = Depends(get_usuario_service)):
+    try:
+        aluno_id = usuario_service.get_student_by_matricula(projeto_data.aluno_matr)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    try:
+        orientador_id = usuario_service.get_teacher_by_matricula(projeto_data.orientador_matr)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+    print(orientador_id["id"])
+    print(aluno_id["id"])
+    
     try:
         projeto_id = projeto_service.criar_projeto_com_tags(
             curso_id=projeto_data.curso_id,
-            orientador_id=projeto_data.orientador_id,
-            aluno_id=projeto_data.aluno_id,
+            orientador_id=orientador_id['id'],
+            aluno_id=aluno_id['id'],
             titulo=projeto_data.titulo,
             status=projeto_data.status,
             tags=projeto_data.tags

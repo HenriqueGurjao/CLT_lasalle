@@ -1,6 +1,8 @@
 from typing import Optional
 from app.ms.final_paper.repositories.projeto_final_repository import ProjetoFinalRepository
 from app.ms.final_paper.services.tag_service import TagService
+from fastapi import FastAPI, HTTPException
+import httpx
 
 class ProjetoFinalService:
     def __init__(self, projeto_repository: ProjetoFinalRepository, tag_service: TagService):
@@ -23,3 +25,19 @@ class ProjetoFinalService:
     
     def listar_projetos_com_filtros(self, curso_id: Optional[int] = None, status: Optional[str] = None, aluno_id: Optional[int] = None, orientador_id: Optional[int] = None):
         return self.projeto_repository.listar_projetos(curso_id, status, aluno_id, orientador_id)
+    
+    async def get_user_from_api(self, matr: str, access_token: str):
+        url = "http://localhost:8000/api/v1/aluno/"+matr  # Substitua com o URL da API externa
+
+        cookies = {
+            "auth_token": access_token  # Definindo o token como um cookie
+        }
+
+        try:
+            async with httpx.AsyncClient() as client:
+                # Envia o cookie com o access_token
+                response = await client.get(url, cookies=cookies)
+                response.raise_for_status()  
+                return response.json()
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(status_code=exc.response.status_code, detail=str(exc))

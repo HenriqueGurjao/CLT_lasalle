@@ -113,9 +113,8 @@ class UsuarioRepository:
 
     def obter_aluno_por_matricula(self, matricula: str) -> int:
         conn = get_db_connection()
-
         query = """
-                    SELECT nome, matricula, periodo, curso_id, email, status, data_ingressao FROM CLT_LASALLE.ALUNOS A
+                    SELECT nome, matricula, periodo, curso_id, email, status, data_ingressao, usuario_id FROM CLT_LASALLE.ALUNOS A
                     INNER JOIN CLT_LASALLE.USUARIOS U 
                     ON A.USUARIO_ID = U.ID
                     WHERE matricula = %s;
@@ -134,10 +133,41 @@ class UsuarioRepository:
                     "email": result[4],
                     "status": result[5],
                     "data_ingressao": result[6],
+                    "id": result[7],
                 }
                 return aluno_dict
         except Exception as e:
-            raise HTTPException(status_code=404, detail="Matrícula não encontrada ")
+            raise HTTPException(status_code=404, detail="Matrícula do aluno não encontrada ")
+        finally:
+            conn.close()
+
+    def obter_professor_por_matricula(self, matricula: str):
+        conn = get_db_connection()
+        query = """
+            SELECT nome, matricula, email, departamento, titulacao, funcao, p.id FROM CLT_LASALLE.PROFESSORES P
+            INNER JOIN CLT_LASALLE.USUARIOS U 
+            ON P.USUARIO_ID = U.ID
+            WHERE matricula = %s;
+        """
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (matricula,))
+                result = cursor.fetchone()  
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Matrícula do professor não encontrada")  
+                # Verifique se o resultado está correto
+                professor_dict = {
+                    "nome": result[0],
+                    "matricula": result[1],
+                    "email": result[2],
+                    "departamento": result[3],
+                    "titulacao": result[4],
+                    "funcao": result[5],
+                    "id": result[6],
+                }
+                return professor_dict
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao obter professor: {str(e)}")
         finally:
             conn.close()
 

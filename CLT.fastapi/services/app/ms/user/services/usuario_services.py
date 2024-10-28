@@ -18,6 +18,9 @@ class UsuarioService:
     def get_student_by_matricula(self, matricula):
         return self.usuario_repository.obter_aluno_por_matricula(matricula)
     
+    def get_teacher_by_matricula(self, matricula):
+        return self.usuario_repository.obter_professor_por_matricula(matricula)
+    
     def get_user_permissions(self, user):
         return self.usuario_repository.find_user_permissions(user.matricula)
     

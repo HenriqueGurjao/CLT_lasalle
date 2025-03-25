@@ -15,6 +15,7 @@ class ProjetoFinalRepository:
                 conn.commit()
                 return projeto_id
         except Exception as e:
+            print(e)
             conn.rollback()
             raise HTTPException(status_code=500, detail=f"Erro ao criar projeto final: {e}")
         finally:

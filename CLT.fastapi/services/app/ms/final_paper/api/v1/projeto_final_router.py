@@ -27,13 +27,15 @@ async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_se
         raise HTTPException(status_code=404, detail=str(e))
     
     print(orientador_id["id"])
-    print(aluno_id["id"])
+    print(aluno_id["aluno_id"])
+
+    # print(projeto_data.id, projeto_data.curso_id, projeto_data.titulo, projeto_data.status, projeto_data.tags, aluno_id["id"], orientador_id["id"])
     
     try:
         projeto_id = projeto_service.criar_projeto_com_tags(
             curso_id=projeto_data.curso_id,
             orientador_id=orientador_id['id'],
-            aluno_id=aluno_id['id'],
+            aluno_id=aluno_id['aluno_id'],
             titulo=projeto_data.titulo,
             status=projeto_data.status,
             tags=projeto_data.tags

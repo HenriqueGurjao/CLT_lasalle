@@ -44,7 +44,7 @@ def get_usuario(matricula: str, usuario_service: UsuarioService = Depends(get_us
 @router.get("/professor/{matricula}", tags=["Professor"])
 def get_professor(matricula: str, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
-        return usuario_service.get_student_by_matricula(matricula) #mudar depois
+        return usuario_service.get_teacher_by_matricula(matricula) #mudar depois
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     

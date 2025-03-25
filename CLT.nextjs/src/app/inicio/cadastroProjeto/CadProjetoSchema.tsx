@@ -23,8 +23,6 @@ export function CadProjetoForm() {
 
   async function onSubmit(values: z.infer<typeof CadProjetoFormSchema>) {
 
-    console.log(JSON.stringify(values))
-
     try {
       const response = await fetch("http://localhost:8000/api/v1/professor/projeto-final", {
         method: "POST",
@@ -35,11 +33,17 @@ export function CadProjetoForm() {
         credentials: "include", 
       });
 
-      if (response && !response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null); // Garante que não vai quebrar caso o JSON seja inválido
+  
+        const errorMessage = errorData?.detail || `Erro ao cadastrar (código ${response.status}).`;
+  
         toast({
-          title: "Erro ao cadastrar aluno.",
+          title: "Erro!",
+          description: errorMessage.split(":")[1],
           variant: "destructive",
-        })
+        });
+  
         return;
       }
 

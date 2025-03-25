@@ -114,7 +114,8 @@ class UsuarioRepository:
     def obter_aluno_por_matricula(self, matricula: str) -> int:
         conn = get_db_connection()
         query = """
-                    SELECT nome, matricula, periodo, curso_id, email, status, data_ingressao, usuario_id FROM CLT_LASALLE.ALUNOS A
+                    SELECT nome, matricula, periodo, curso_id, email, status, data_ingressao, usuario_id, a.id 
+                    FROM CLT_LASALLE.ALUNOS A
                     INNER JOIN CLT_LASALLE.USUARIOS U 
                     ON A.USUARIO_ID = U.ID
                     WHERE matricula = %s;
@@ -134,6 +135,7 @@ class UsuarioRepository:
                     "status": result[5],
                     "data_ingressao": result[6],
                     "id": result[7],
+                    "aluno_id": result[8],
                 }
                 return aluno_dict
         except Exception as e:
@@ -144,7 +146,7 @@ class UsuarioRepository:
     def obter_professor_por_matricula(self, matricula: str):
         conn = get_db_connection()
         query = """
-            SELECT nome, matricula, email, departamento, titulacao, funcao, p.id FROM CLT_LASALLE.PROFESSORES P
+            SELECT nome, matricula, email, departamento, titulacao, funcao, p.id, u.id FROM CLT_LASALLE.PROFESSORES P
             INNER JOIN CLT_LASALLE.USUARIOS U 
             ON P.USUARIO_ID = U.ID
             WHERE matricula = %s;
@@ -164,6 +166,7 @@ class UsuarioRepository:
                     "titulacao": result[4],
                     "funcao": result[5],
                     "id": result[6],
+                    "usuario_id": result[7]
                 }
                 return professor_dict
         except Exception as e:

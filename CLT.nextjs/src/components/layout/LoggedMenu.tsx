@@ -33,7 +33,6 @@ export const LoggedMenu = () => {
 
   const { role } = useAuth();
 
-  console.log(role);
   return (
     <>
       {path != "/auth" && path != "/" && (

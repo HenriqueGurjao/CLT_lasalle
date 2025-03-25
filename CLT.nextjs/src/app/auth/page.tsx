@@ -23,6 +23,7 @@ import { CircleNotch, EyeClosed } from "phosphor-react";
 import { AuthForm } from "./forms/AuthSchema";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useState } from "react";
+import Image from 'next/image';
 
 export default function Auth() {
   const { form, onSubmit } = AuthForm();
@@ -38,7 +39,12 @@ export default function Auth() {
   return (
     <section className=" h-full w-full flex justify-between items-center md:items-start gap-2">
       <div className=" border bg-blue-400 w-1/2 hidden h-full md:w-2/3 md:flex justify-center items-center">
-        Imagem
+        <Image
+          src="/imagem/Login_TCC.jpg"
+          alt="imagem tela de login" 
+          width={1000}   
+          height={300} 
+        />
       </div>
       <div className="flex items-start justify-center w-full md:w-1/3 p-2 lg:p-14">
         <Card className="w-full">

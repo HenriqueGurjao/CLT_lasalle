@@ -5,7 +5,7 @@ DB_HOST = "localhost"
 DB_PORT = "5432"
 DB_NAME = "postgres"
 DB_USER = "postgres"
-DB_PASSWORD = "admin"
+DB_PASSWORD = "123456789"
 DB_SCHEMA = "clt_lasalle"
 
 # Função para criar a conexão

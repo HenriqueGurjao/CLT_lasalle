@@ -46,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isFirstVisit = !sessionStorage.getItem("visited");
+      const localMatricula = localStorage.getItem("matricula");
 
       const checkAuth = async () => {
         try {
@@ -53,6 +54,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             method: "POST",
             credentials: "include",
           });
+
+          const userActive = await fetch("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
+            method: "GET",
+            credentials: "include",
+          })
+          
+          const isUserActive = await userActive.json() 
+          console.log("usuario ativo: ", isUserActive)
+          setIsActive(isActive)
 
           if (response.ok) {
             const data = await response.json();
@@ -83,12 +93,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (isFirstVisit) {
         sessionStorage.setItem("visited", "true");
+        setLoading(true);
         setFirstVisit(true);
 
         setTimeout(() => {
           checkAuth();
         }, 3000); 
       } else if (path === "/auth") {
+        setLoading(true);
         setTimeout(() => {
           checkAuth();
         }, 3000);

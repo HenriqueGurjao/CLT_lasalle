@@ -26,7 +26,7 @@ def criar_professor(professor: Professor, usuario_service: UsuarioService = Depe
     except Exception as e: 
         raise HTTPException(status_code=400, detail=str(e))
     
-@router.put("/self/ativar_conta/{matricula}", tags=["Usuário"])
+@router.put("/ativar_conta/{matricula}", tags=["Usuário"])
 def ativar_conta(matricula: str, updatePassword: UpdatePassword, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
         usuario_service.activate_account(updatePassword.matricula, updatePassword.password, updatePassword.new_password)
@@ -48,11 +48,18 @@ def get_professor(matricula: str, usuario_service: UsuarioService = Depends(get_
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-@router.put("/self/atualizar_senha/{matricula}", tags=["Usuário"])
+@router.put("/atualizar_senha/{matricula}", tags=["Usuário"])
 def atualizar_senha(matricula: str, updatePassword: UpdatePassword, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
         usuario_service.update_user_password(updatePassword.matricula, updatePassword.password, updatePassword.new_password)
         return {"msg": "Senha atualizada com sucesso"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+@router.get("/conta_ativa", tags=["Usuário"])
+def is_user_active(matricula: str, usuario_service: UsuarioService = Depends(get_usuario_service)):
+    try:
+        return usuario_service.is_account_active(matricula)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) 
 

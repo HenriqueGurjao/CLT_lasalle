@@ -20,7 +20,8 @@ export const Header = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-      const endpoint = `http://localhost:8000/api/v1/aluno/${matriculaLocalStorage}`
+      const redirectUrl = matriculaLocalStorage == '00500500' ? 'professor' : matriculaLocalStorage?.startsWith('005') ? 'aluno' : 'aluno';
+      const endpoint = `http://localhost:8000/api/v1/${redirectUrl}/${matriculaLocalStorage}`
       if (path === "/" || path === "/auth") return;
       try {
         const response  = await fetchWithAuth (endpoint, {
@@ -73,18 +74,6 @@ export const Header = () => {
         <div>
           {path != "/auth" && path != "/" ? (
             <div className="flex gap-2 items-center">
-              <div className="flex items-center gap-2">
-                <Input
-                  className="h-8"
-                  placeholder="Campo de buscas"
-                />
-                <Button
-                  variant={"outline"}
-                  className="p-0 flex rounded-full w-12"
-                >
-                  <MagnifyingGlass size={16} className="" />
-                </Button>
-              </div>
               <div>
                 <AvatarMenu />
               </div>

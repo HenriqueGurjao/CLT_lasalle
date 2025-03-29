@@ -3,6 +3,7 @@ from app.ms.final_paper.repositories.projeto_final_repository import ProjetoFina
 from app.ms.final_paper.services.tag_service import TagService
 from fastapi import FastAPI, HTTPException
 import httpx
+from typing import List
 
 class ProjetoFinalService:
     def __init__(self, projeto_repository: ProjetoFinalRepository, tag_service: TagService):
@@ -23,8 +24,18 @@ class ProjetoFinalService:
 
         return projeto_id
     
-    def listar_projetos_com_filtros(self, curso_id: Optional[int] = None, status: Optional[str] = None, aluno_id: Optional[int] = None, orientador_id: Optional[int] = None):
-        return self.projeto_repository.listar_projetos(curso_id, status, aluno_id, orientador_id)
+    def listar_projetos_com_filtros(
+            self, 
+            cursos_id: Optional[str] = None, 
+            status: Optional[str] = None, 
+            aluno_id: Optional[int] = None, 
+            orientador_id: Optional[int] = None, 
+            pagina: Optional[int] = None,
+            itens_por_pagina: Optional[int] = None,
+            pesquisa: Optional[str] = None,
+            periodos: Optional[str] = None,
+        ):
+        return self.projeto_repository.listar_projetos(cursos_id, status, aluno_id, orientador_id, pagina, itens_por_pagina, pesquisa, periodos)
     
     async def get_user_from_api(self, matr: str, access_token: str):
         url = "http://localhost:8000/api/v1/aluno/"+matr  # Substitua com o URL da API externa

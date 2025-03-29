@@ -17,13 +17,27 @@ const years = Array.from(
   (_, i) => i + startPeriod
 );
 
-export const Filters = () => {
-  const [selectedTags, setSelectedTags] = React.useState<FilterProps[]>([]);
-  const [selectedCursos, setSelectedCursos] = React.useState<FilterProps[]>([]);
-  const [selectedPeriods, setSelectedPeriods] = React.useState<FilterProps[]>(
-    []
-  );
-  const [cursos, setCursos] = React.useState<FilterProps[]>([]);
+export interface FiltersProps {
+  selectedTags: FilterProps[];
+  setSelectedTags: React.Dispatch<React.SetStateAction<FilterProps[]>>;
+  selectedCursos: FilterProps[];
+  setSelectedCursos: React.Dispatch<React.SetStateAction<FilterProps[]>>;
+  selectedPeriods: FilterProps[];
+  setSelectedPeriods: React.Dispatch<React.SetStateAction<FilterProps[]>>;
+  cursos: FilterProps[];
+  setCursos: React.Dispatch<React.SetStateAction<FilterProps[]>>;
+}
+
+export const Filters: React.FC<FiltersProps> = ({
+  selectedTags,
+  setSelectedTags,
+  selectedCursos,
+  setSelectedCursos,
+  selectedPeriods,
+  setSelectedPeriods,
+  cursos,
+  setCursos,
+}) => {
 
   useEffect(() => {
     const fetchCursoData = async () => {
@@ -73,7 +87,7 @@ export const Filters = () => {
   return (
     <div className="w-full h-full relative">
       <div className="flex relative w-full">
-        <span className="absolute z-10 text-xs bg-zinc-100 dark:bg-gray-900 left-2 top-[-10px] px-2">
+        <span className="absolute z-10 text-xs bg-yellow-300 text-zinc-900 dark:bg-gray-400 left-2 top-[-10px] px-2 rounded-md">
           Filtros
         </span>
         <ul className="flex gap-1 border p-1 w-full min-h-10 flex-wrap">

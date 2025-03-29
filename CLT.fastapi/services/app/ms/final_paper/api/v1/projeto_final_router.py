@@ -46,17 +46,25 @@ async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_se
     
 @router.get("/projetos", tags=["Projeto_final"])
 async def listar_projetos_finais(
-    curso_id: Optional[List[int]] = Query(None),
+    cursos_id: Optional[str] = Query(None),
     status: Optional[List[str]] = Query(None),
     aluno_id: Optional[List[int]] = Query(None),
-    orientador_id: Optional[List[int]] = Query(None)
+    orientador_id: Optional[List[int]] = Query(None),
+    pagina:  Optional[List[int]] = Query(1),
+    itens_por_pagina: Optional[List[int]] = Query(2),
+    pesquisa: Optional[str] = Query(None),
+    periodos: Optional[str] = Query(None)
 ):
     try:
         projetos = projeto_service.listar_projetos_com_filtros(
-            curso_id=curso_id,
+            cursos_id=cursos_id,
             status=status,
             aluno_id=aluno_id,
-            orientador_id=orientador_id
+            orientador_id=orientador_id,
+            pagina=pagina,
+            itens_por_pagina=itens_por_pagina,
+            pesquisa=pesquisa,
+            periodos=periodos
         )
         return projetos
     except Exception as e:

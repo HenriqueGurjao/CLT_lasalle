@@ -52,6 +52,7 @@ class UsuarioRepository:
                 conn.commit() 
             return usuario_id
         except Exception as e:
+            print(e)
             conn.rollback()  
             raise Exception(f"Erro ao criar usuário: {str(e)}")
         finally:

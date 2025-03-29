@@ -26,9 +26,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import { MagnifyingGlass } from "phosphor-react";
+import React, { useState } from "react";
 
-export const LoggedMenu = () => {
+interface LoggedMenuProps {
+  searchInput: string;
+  setSearchInput: React.Dispatch<React.SetStateAction<string>>;
+  fetchProjetos: () => Promise<void>;
+}
+export const LoggedMenu = ({
+  searchInput,
+  setSearchInput,
+  fetchProjetos,
+}: LoggedMenuProps) => {
   const path = usePathname();
 
   const { role } = useAuth();
@@ -36,9 +46,9 @@ export const LoggedMenu = () => {
   return (
     <>
       {path != "/auth" && path != "/" && (
-        <div className="w-ful border p-2 flex justify-between">
+        <div className="w-ful border p-2 flex justify-between bg-blue-700 rounded-t-md dark:bg-gray-800">
           <ul className="flex gap-3 items-center">
-            <li>
+            {/* <li>
               <Link
                 className="hover:underline"
                 href={"/inicio"}
@@ -61,9 +71,27 @@ export const LoggedMenu = () => {
               >
                 Gerenciar Projetos
               </Link>
-            </li>
+            </li> */}
           </ul>
           <ul className="flex gap-3">
+            <li className="flex items-center gap-2">
+              <Input
+                className="h-8"
+                placeholder="Campo de buscas"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              <Button
+                variant={"outline"}
+                className="p-0 flex rounded-full w-12"
+                onClick={() => fetchProjetos()}
+              >
+                <MagnifyingGlass
+                  size={16}
+                  className=""
+                />
+              </Button>
+            </li>
             <li>
               <Dialog>
                 <DialogTrigger asChild>

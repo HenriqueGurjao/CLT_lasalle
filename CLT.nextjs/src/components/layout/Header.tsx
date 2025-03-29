@@ -20,7 +20,8 @@ export const Header = () => {
   useEffect(() => {
     const fetchData = async () => {
 
-      const endpoint = `http://localhost:8000/api/v1/aluno/${matriculaLocalStorage}`
+      const redirectUrl = matriculaLocalStorage == '00500500' ? 'professor' : matriculaLocalStorage?.startsWith('005') ? 'aluno' : 'aluno';
+      const endpoint = `http://localhost:8000/api/v1/${redirectUrl}/${matriculaLocalStorage}`
       if (path === "/" || path === "/auth") return;
       try {
         const response  = await fetchWithAuth (endpoint, {
@@ -44,16 +45,16 @@ export const Header = () => {
   }, [matriculaLocalStorage, path, setUser]);
 
   return (
-    <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white">
+    <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white bg-gray-200 overflow-hidden pl-6">
       <div className="pr-3 sm:pr-14 w-full flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-yellow-400 dark:text-white px-6">
-        <Image
-          src="/imagem/logo/Central Lasalle de TCCs/WordPress/wordpress_logo_transparent_512x512.png"
-          alt="imagem tela de login" 
-          width={300}   
-          height={300} 
-        />
-        </h1>
+        <a href="http://localhost:3000" className="text-3xl font-bold text-yellow-400 dark:text-white">
+          <Image
+            src="/imagem/logo/Central Lasalle de TCCs/WordPress/wordpress_logo_transparent_512x512.png"
+            alt="imagem tela de login" 
+            width={300}   
+            height={300} 
+          />
+        </a>
         {/* <ul>
           <li className=" flex gap-5 font-bold">
             <Link
@@ -73,18 +74,6 @@ export const Header = () => {
         <div>
           {path != "/auth" && path != "/" ? (
             <div className="flex gap-2 items-center">
-              <div className="flex items-center gap-2">
-                <Input
-                  className="h-8"
-                  placeholder="Campo de buscas"
-                />
-                <Button
-                  variant={"outline"}
-                  className="p-0 flex rounded-full w-12"
-                >
-                  <MagnifyingGlass size={16} className="" />
-                </Button>
-              </div>
               <div>
                 <AvatarMenu />
               </div>

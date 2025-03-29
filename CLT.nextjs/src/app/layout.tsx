@@ -44,7 +44,7 @@ export default function RootLayout({
               <Header />
               <div className="flex flex-col h-[calc(100vh-3.5rem)] ">
                 {/* <SideMenu /> */}
-                <LoggedMenu />
+                {/* <LoggedMenu /> */}
                 <main className="flex-1 mx-auto p-4 overflow-y-auto w-full">
                   {children}
                 </main>

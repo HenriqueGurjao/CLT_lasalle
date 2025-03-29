@@ -17,6 +17,7 @@ export const DropdownFilterGroup = ({
   selected,
   setSelected,
 }: DropdownFilterGroupProps) => {
+  
   const handleSelect = (option: FilterProps) => {
     setSelected((prev) => {
       const isAlreadySelected = prev.some((item) => item.id === option.id);

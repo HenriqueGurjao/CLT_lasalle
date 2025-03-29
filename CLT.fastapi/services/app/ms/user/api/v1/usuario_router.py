@@ -16,6 +16,7 @@ def criar_aluno(aluno: Aluno, usuario_service: UsuarioService = Depends(get_usua
         usuario_service.registrar_aluno(aluno)
         return {"msg": "Aluno criado com sucesso"}
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/coordenador/professores/", tags=["Coordenador"])
@@ -44,7 +45,7 @@ def get_usuario(matricula: str, usuario_service: UsuarioService = Depends(get_us
 @router.get("/professor/{matricula}", tags=["Professor"])
 def get_professor(matricula: str, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
-        return usuario_service.get_student_by_matricula(matricula) #mudar depois
+        return usuario_service.get_teacher_by_matricula(matricula) #mudar depois
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     

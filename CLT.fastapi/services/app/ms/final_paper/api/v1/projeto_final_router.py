@@ -27,13 +27,15 @@ async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_se
         raise HTTPException(status_code=404, detail=str(e))
     
     print(orientador_id["id"])
-    print(aluno_id["id"])
+    print(aluno_id["aluno_id"])
+
+    # print(projeto_data.id, projeto_data.curso_id, projeto_data.titulo, projeto_data.status, projeto_data.tags, aluno_id["id"], orientador_id["id"])
     
     try:
         projeto_id = projeto_service.criar_projeto_com_tags(
             curso_id=projeto_data.curso_id,
             orientador_id=orientador_id['id'],
-            aluno_id=aluno_id['id'],
+            aluno_id=aluno_id['aluno_id'],
             titulo=projeto_data.titulo,
             status=projeto_data.status,
             tags=projeto_data.tags
@@ -44,17 +46,25 @@ async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_se
     
 @router.get("/projetos", tags=["Projeto_final"])
 async def listar_projetos_finais(
-    curso_id: Optional[List[int]] = Query(None),
+    cursos_id: Optional[str] = Query(None),
     status: Optional[List[str]] = Query(None),
     aluno_id: Optional[List[int]] = Query(None),
-    orientador_id: Optional[List[int]] = Query(None)
+    orientador_id: Optional[List[int]] = Query(None),
+    pagina:  Optional[List[int]] = Query(1),
+    itens_por_pagina: Optional[List[int]] = Query(2),
+    pesquisa: Optional[str] = Query(None),
+    periodos: Optional[str] = Query(None)
 ):
     try:
         projetos = projeto_service.listar_projetos_com_filtros(
-            curso_id=curso_id,
+            cursos_id=cursos_id,
             status=status,
             aluno_id=aluno_id,
-            orientador_id=orientador_id
+            orientador_id=orientador_id,
+            pagina=pagina,
+            itens_por_pagina=itens_por_pagina,
+            pesquisa=pesquisa,
+            periodos=periodos
         )
         return projetos
     except Exception as e:

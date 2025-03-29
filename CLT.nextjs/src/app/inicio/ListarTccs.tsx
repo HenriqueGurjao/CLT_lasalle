@@ -2,8 +2,15 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useEffect, useState } from "react";
 import { ProjetoFinal } from "./filters.dtypes";
 import fetchWithAuth from "@/utils/fetchWithAuth";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CircleNotch } from "phosphor-react";
 
 interface ListTccsProps {
   itens_por_pagina: number;
@@ -14,7 +21,14 @@ interface ListTccsProps {
   projetos: ProjetoFinal[] | null;
 }
 
-export const ListTccs = ({ itens_por_pagina, pagina, projetos, anos, cursos, pesquisa }: ListTccsProps) => {
+export const ListTccs = ({
+  itens_por_pagina,
+  pagina,
+  projetos,
+  anos,
+  cursos,
+  pesquisa,
+}: ListTccsProps) => {
   const [flipped, setFlipped] = useState<number | null>(null);
   // const [projetos, setProjetos] = useState<ProjetoFinal[] | null>(null);
 
@@ -42,7 +56,7 @@ export const ListTccs = ({ itens_por_pagina, pagina, projetos, anos, cursos, pes
   // }, []);
 
   return (
-    <ul className="border p-4 grid grid-cols-4 gap-2">
+    <ul className="p-4 grid grid-cols-4 gap-2 ">
       {projetos ? (
         projetos.map((tcc, index) => (
           <li key={index}>
@@ -79,7 +93,9 @@ export const ListTccs = ({ itens_por_pagina, pagina, projetos, anos, cursos, pes
           </li>
         ))
       ) : (
-        <div>carregando</div>
+        <div className="fixed top-1/2 left-1/2">
+          <CircleNotch size={32} className="text-yellow-500 animate-spin"/>
+        </div>
       )}
     </ul>
   );

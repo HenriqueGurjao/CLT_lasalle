@@ -34,7 +34,11 @@ interface LoggedMenuProps {
   setSearchInput: React.Dispatch<React.SetStateAction<string>>;
   fetchProjetos: () => Promise<void>;
 }
-export const LoggedMenu = ({searchInput, setSearchInput, fetchProjetos}: LoggedMenuProps) => {
+export const LoggedMenu = ({
+  searchInput,
+  setSearchInput,
+  fetchProjetos,
+}: LoggedMenuProps) => {
   const path = usePathname();
 
   const { role } = useAuth();
@@ -80,9 +84,12 @@ export const LoggedMenu = ({searchInput, setSearchInput, fetchProjetos}: LoggedM
               <Button
                 variant={"outline"}
                 className="p-0 flex rounded-full w-12"
-                onClick={() => fetchProjetos()} 
+                onClick={() => fetchProjetos()}
               >
-                <MagnifyingGlass size={16} className="" />
+                <MagnifyingGlass
+                  size={16}
+                  className=""
+                />
               </Button>
             </li>
             <li>

@@ -18,3 +18,6 @@ class CursoService:
     
     def listar_cursos_resumidos(self):
         return self.repository.obter_cursos_resumidos()
+    
+    def buscar_curso_por_id(self, curso_id: int):
+        return self.repository.obter_curso_por_id(curso_id)

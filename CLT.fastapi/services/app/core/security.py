@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from fastapi import HTTPException, Request, status
 from jose import JWTError, jwt
 from dotenv import load_dotenv
 from passlib.context import CryptContext
@@ -43,6 +44,31 @@ def verify_access_token(token: str):
         return payload
     except JWTError:
         return None
+    
+def validate_recovery_token(self, encrypted_token: str, request: Request):
+    try:
+        decrypted_token = decrypt_token(encrypted_token)
+
+        payload = verify_access_token(decrypted_token)
+        if payload is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token inválido ou expirado."
+            )
+        
+        if payload.get("type") != "recovery":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Tipo de token inválido para este fluxo."
+            )
+
+        return payload
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro na validação do token de recuperação: {str(e)}"
+        )
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

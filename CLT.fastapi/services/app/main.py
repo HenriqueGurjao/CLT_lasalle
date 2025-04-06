@@ -1,3 +1,5 @@
+import sys
+import traceback
 from fastapi import FastAPI, Request, Response
 from app.ms.user.api.v1.usuario_router import router as usuario_router
 from app.ms.user.api.v1.auth_router import router as auth_router
@@ -34,7 +36,16 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     try:
-        if request.url.path  in ["/docs", "/redoc", "/api/v1/auth/login", "/openapi.json", "/api/v1/auth/logout", "/api/v1/auth/refresh"] or request.method == "OPTIONS":
+        if request.url.path  in [
+            "/docs", 
+            "/redoc", 
+            "/api/v1/auth/login", 
+            "/openapi.json", 
+            "/api/v1/auth/logout", 
+            "/api/v1/auth/refresh", 
+            "/api/v1/enviar_email_recuperacao",
+            "/api/v1/redefinir_senha"
+        ] or request.method == "OPTIONS":
             try:
                 return await call_next(request)
             except Exception as e:
@@ -68,7 +79,15 @@ async def auth_middleware(request: Request, call_next):
             return response
         return JSONResponse(status_code=401, content={"detail": "Token inválido"})
     except Exception as e:
-        return Response(status_code=503, content={"detail": f"Erro ao processar token: {e}"})
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb = traceback.extract_tb(exc_tb)
+        last_trace = tb[-1]  # Pega a última linha do traceback
+
+        print(f"Erro: {e}")
+        print(f"Arquivo: {last_trace.filename}")
+        print(f"Linha: {last_trace.lineno}")
+        print(f"Função: {last_trace.name}")
+        return JSONResponse(status_code=503, content={"detail": f"Erro ao processar a requisicao: {e}"})
         raise JSONResponse(status_code=401, content={"detail": f"Erro ao processar token: {e}"})
             
 

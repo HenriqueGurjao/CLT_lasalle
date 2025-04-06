@@ -33,11 +33,13 @@ interface LoggedMenuProps {
   searchInput: string;
   setSearchInput: React.Dispatch<React.SetStateAction<string>>;
   fetchProjetos: () => Promise<void>;
+  setCurrentPage: (page:number) => void;
 }
 export const LoggedMenu = ({
   searchInput,
   setSearchInput,
   fetchProjetos,
+  setCurrentPage
 }: LoggedMenuProps) => {
   const path = usePathname();
 
@@ -84,7 +86,10 @@ export const LoggedMenu = ({
               <Button
                 variant={"outline"}
                 className="p-0 flex rounded-full w-12"
-                onClick={() => fetchProjetos()}
+                onClick={(() => {
+                  fetchProjetos()
+                  setCurrentPage(1)
+                })}
               >
                 <MagnifyingGlass
                   size={16}

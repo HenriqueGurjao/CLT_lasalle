@@ -1,9 +1,11 @@
+from typing import List, Optional, Union
 from fastapi.responses import JSONResponse
 from app.ms.user.domain.usuario import Usuario, Aluno, Professor
 from app.db.connection import get_db_connection
 from app.core.security import hash_password
 from fastapi import HTTPException, Request
 from starlette.responses import RedirectResponse
+from .allowed_columns import ALUNO_ALLOWED_COLUMNS, PROFESSOR_ALLOWED_COLUMNS
 
 class UsuarioRepository:
     def __init__(self):
@@ -56,7 +58,7 @@ class UsuarioRepository:
             conn.rollback()  
             raise Exception(f"Erro ao criar usuário: {str(e)}")
         finally:
-            conn.close()  
+            conn.close  
 
     def criar_aluno(self, aluno: Aluno):
         # if self.usuario_existe(aluno.email):
@@ -84,7 +86,7 @@ class UsuarioRepository:
                 conn.rollback()  
                 raise Exception(f"Erro ao criar aluno: {str(e)}")
             finally:
-                conn.close() 
+                conn.close 
 
     def obter_usuario_id(self, email: str) -> int:
         conn = get_db_connection()
@@ -96,7 +98,7 @@ class UsuarioRepository:
         except Exception as e:
             raise Exception(f"Erro ao obter ID do usuário: {e}")
         finally:
-            conn.close()
+            conn.close
 
     def obter_senha_usuario_por_matricula(self, matricula: str) -> int:
         conn = get_db_connection()
@@ -110,7 +112,7 @@ class UsuarioRepository:
         except Exception as e:
             raise HTTPException(status_code=404, detail="Matrícula não encontrada ")
         finally:
-            conn.close()
+            conn.close
 
     def obter_aluno_por_matricula(self, matricula: str) -> int:
         conn = get_db_connection()
@@ -142,7 +144,7 @@ class UsuarioRepository:
         except Exception as e:
             raise HTTPException(status_code=404, detail="Matrícula do aluno não encontrada ")
         finally:
-            conn.close()
+            conn.close
 
     def obter_professor_por_matricula(self, matricula: str):
         conn = get_db_connection()
@@ -158,7 +160,6 @@ class UsuarioRepository:
                 result = cursor.fetchone()  
                 if result is None:
                     raise HTTPException(status_code=404, detail="Matrícula do professor não encontrada")  
-                # Verifique se o resultado está correto
                 professor_dict = {
                     "nome": result[0],
                     "matricula": result[1],
@@ -173,7 +174,7 @@ class UsuarioRepository:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Erro ao obter professor: {str(e)}")
         finally:
-            conn.close()
+            conn.close
 
     def criar_professor(self, professor: Professor):
         # if self.usuario_existe(professor.email):
@@ -200,7 +201,7 @@ class UsuarioRepository:
                     conn.rollback() 
                     raise Exception(f"Erro ao criar professor: {str(e)}")
                 finally:
-                    conn.close()
+                    conn.close
             else:       
                 raise Exception('O email do professor deve começar com "prof.".') 
 
@@ -214,7 +215,7 @@ class UsuarioRepository:
             conn.rollback()  
             raise Exception(f"Erro ao atualizar senha: {str(e)}")
         finally:
-            conn.close()
+            conn.close
 
     def activate_account(self, matricula):
         conn = get_db_connection()
@@ -226,7 +227,7 @@ class UsuarioRepository:
             conn.rollback()  
             raise Exception(f"Erro ao ativar conta: {str(e)}")
         finally:
-            conn.close()
+            conn.close
 
     def is_user_active(self, matricula: str):
         if matricula is None:
@@ -237,13 +238,103 @@ class UsuarioRepository:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT ativo FROM CLT_LASALLE.usuarios WHERE matricula = %s", (matricula,))
                 result = cursor.fetchone()
-                if result is None or not result[0]:# Se não encontrado ou não ativo
+                if result is None or not result[0]:
                     return False
                     # return RedirectResponse(url="/ativar-conta")  # Altere para sua rota de ativação
                 # return result[0]
         except Exception as e:
             raise HTTPException(status_code=500, detail="Erro ao verificar status do usuário")
         finally:
-            conn.close()
+            conn.close
 
         return True
+    
+    def get_user_by_email(self, email: str):
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM CLT_LASALLE.usuarios WHERE email = %s", (email,))
+                result = cursor.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Usuário não encontrado")
+                return result
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao obter usuário: {str(e)}")
+        finally:
+            conn.close
+
+    def get_user_by(
+    self,
+    table: str,  # Ex: "alunos a"
+    value: Union[str, int],
+    by: str = "id",  # Ex: "a.id"
+    columns: Optional[List[str]] = None
+):
+        conn = get_db_connection()
+
+        table_name = table.split()[0].lower()  
+        allowed_columns = ALUNO_ALLOWED_COLUMNS if table_name == "alunos" else PROFESSOR_ALLOWED_COLUMNS
+
+        if not columns:
+            selected_cols = ", ".join(allowed_columns.values())
+        else:
+            selected_keys = []
+            for col in columns:
+                if not col or "." not in col:
+                    raise HTTPException(status_code=400, detail=f"Formato inválido para coluna: {col}")
+                
+                clean_col = col.split(".")[-1]
+                if clean_col not in allowed_columns:
+                    raise HTTPException(status_code=400, detail=f"Coluna inválida: {col}")
+        
+                selected_keys.append(col)  # mantém o alias no SELECT
+            selected_cols = ", ".join(selected_keys)
+
+        by_column = by
+        query = f"""
+                    SELECT {selected_cols}
+                    FROM CLT_LASALLE.{table}
+                    JOIN CLT_LASALLE.usuarios u ON u.id = {table.split()[1]}.usuario_id
+                    WHERE {by_column} = %s
+                """
+        
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (value,))
+                result = cursor.fetchone()
+                if not result:
+                    raise HTTPException(status_code=404, detail="Usuário não encontrado")
+                return result
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao buscar usuário: {str(e)}")
+        finally:
+            conn.close()
+
+
+    def get_teacher_by_id(self, id: int):
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM CLT_LASALLE.professores WHERE id = %s", (id,))
+                result = cursor.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Professor não encontrado")
+                return result
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao obter professor {id}: {str(e)}")
+        finally:
+            conn.close()
+
+    def get_student_by_id(self, id: int):
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM CLT_LASALLE.alunos WHERE id = %s", (id,))
+                result = cursor.fetchone()
+                if result is None:
+                    raise HTTPException(status_code=404, detail="Aluno não encontrado")
+                return result
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao obter aluno {id}: {str(e)}")
+        finally:
+            conn.close()

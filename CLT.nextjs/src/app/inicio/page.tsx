@@ -77,7 +77,6 @@ export default function Home() {
   const fetchData = async () => {
     try {
       let endpoint = `http://localhost:8000/api/v1/projetos?pagina=${currentPage}&itens_por_pagina=${itemsPerPages}`;
-      console.log(endpoint);
       if (searchText.length > 0) endpoint += `&pesquisa=${searchText}`;
 
       console.log(selectedPeriods);
@@ -95,12 +94,10 @@ export default function Home() {
         endpoint += `&pesquisa=${pesquisa}`;
       }
 
-      console.log(endpoint);
       const response = await fetchWithAuth(endpoint);
       const data = await response?.json();
       setProjetos(data.projetos);
       setPagesNumber(data.total_pages)
-      console.log(data);
     } catch (error) {
       console.error("Error fetching tccs:", error);
     }
@@ -119,6 +116,7 @@ export default function Home() {
           searchInput={searchText}
           setSearchInput={setSearchText}
           fetchProjetos={fetchData}
+          setCurrentPage={setCurrentPage}
         />
         <section>
           <Filters

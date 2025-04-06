@@ -112,3 +112,21 @@ class CursoRepository:
             raise HTTPException(status_code=500, detail=f"Erro ao obter cursos: {e}")
         finally:
             conn.close()
+
+    def obter_curso_por_id(self, curso_id: int):
+        conn = get_db_connection()
+
+        if conn is None:
+            raise HTTPException(status_code=500, detail="Erro ao conectar ao banco de dados.")
+
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT id, nome, duracao, descricao FROM CLT_LASALLE.cursos WHERE id = %s", (curso_id,))
+                curso = cursor.fetchone()
+                if curso is None:
+                    raise HTTPException(status_code=404, detail="Curso não encontrado.")
+                return {"id": curso[0], "nome": curso[1], "periodos": curso[2], "descricao": curso[3]}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao obter curso: {e}")
+        finally:
+            conn.close()

@@ -29,3 +29,8 @@ class UpdatePassword(BaseModel):
     new_password: str
     password: str
     matricula: str
+
+class TokenPasswordResetRequest(BaseModel):
+    token: str
+    new_password: str
+    new_password_confirm: str

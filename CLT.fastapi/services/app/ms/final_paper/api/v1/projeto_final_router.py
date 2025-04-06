@@ -4,8 +4,10 @@ from app.ms.final_paper.repositories.projeto_final_repository import ProjetoFina
 from app.ms.final_paper.repositories.tag_repository import TagRepository 
 from app.ms.final_paper.services.tag_service import TagService
 from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, ProjetoFinalCreateSchema
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, File, Form, HTTPException, Query, Depends, UploadFile
 from ....user.services.usuario_services import UsuarioRepository, UsuarioService
+from ....course.services.course_service import CursoService, CursoRepository
+import json
 
 router = APIRouter()
 
@@ -13,10 +15,34 @@ def get_usuario_service() -> UsuarioService:
     usuario_repository = UsuarioRepository()
     return UsuarioService(usuario_repository)
 
-projeto_service = ProjetoFinalService(ProjetoFinalRepository(), TagService(TagRepository()))
+def get_curso_service() -> CursoService:
+    return CursoService()
+
+# projeto_service = ProjetoFinalService(ProjetoFinalRepository(), TagService(TagRepository()))
+
+def get_projeto_service(
+    usuario_service: UsuarioService = Depends(get_usuario_service),
+    curso_service: CursoService = Depends(get_curso_service),
+) -> ProjetoFinalService:
+    projeto_repository = ProjetoFinalRepository()
+    tag_repository = TagRepository()
+    tag_service = TagService(tag_repository)
+    return ProjetoFinalService(projeto_repository, tag_service, curso_service, usuario_service)
+
 
 @router.post("/professor/projeto-final", tags=["Projeto_final"])
-async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_service: UsuarioService = Depends(get_usuario_service)):
+async def criar_projeto_final(
+    projeto_data: str = Form(...),  
+    pdf_file: UploadFile = File(...),
+    projeto_service: ProjetoFinalService = Depends(get_projeto_service),
+    usuario_service: UsuarioService = Depends(get_usuario_service)
+):
+
+    try:
+        projeto_data = json.loads(projeto_data)
+        projeto_data = ProjetoFinalCreateSchema(**projeto_data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Erro ao processar projeto_data: {str(e)}")
     try:
         aluno_id = usuario_service.get_student_by_matricula(projeto_data.aluno_matr)
     except Exception as e:
@@ -25,12 +51,7 @@ async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_se
         orientador_id = usuario_service.get_teacher_by_matricula(projeto_data.orientador_matr)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
-    
-    print(orientador_id["id"])
-    print(aluno_id["aluno_id"])
 
-    # print(projeto_data.id, projeto_data.curso_id, projeto_data.titulo, projeto_data.status, projeto_data.tags, aluno_id["id"], orientador_id["id"])
-    
     try:
         projeto_id = projeto_service.criar_projeto_com_tags(
             curso_id=projeto_data.curso_id,
@@ -38,10 +59,12 @@ async def criar_projeto_final(projeto_data: ProjetoFinalCreateSchema, usuario_se
             aluno_id=aluno_id['aluno_id'],
             titulo=projeto_data.titulo,
             status=projeto_data.status,
-            tags=projeto_data.tags
+            tags=projeto_data.tags,
+            pdf_file=pdf_file
         )
         return {"projeto_id": projeto_id}
     except Exception as e:
+        print(f"Erro ao criar projeto com tags: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/projetos", tags=["Projeto_final"])
@@ -53,7 +76,8 @@ async def listar_projetos_finais(
     pagina:  Optional[List[int]] = Query(1),
     itens_por_pagina: Optional[List[int]] = Query(2),
     pesquisa: Optional[str] = Query(None),
-    periodos: Optional[str] = Query(None)
+    periodos: Optional[str] = Query(None),
+    projeto_service: ProjetoFinalService = Depends(get_projeto_service)
 ):
     try:
         projetos = projeto_service.listar_projetos_com_filtros(

@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
-from app.ms.user.domain.usuario import Aluno, Professor, UpdatePassword
+from fastapi import APIRouter, Depends, HTTPException, Request
+from app.ms.user.domain.usuario import Aluno, Professor, TokenPasswordResetRequest, UpdatePassword
 from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from app.ms.user.services.usuario_services import UsuarioService
 
@@ -45,7 +45,7 @@ def get_usuario(matricula: str, usuario_service: UsuarioService = Depends(get_us
 @router.get("/professor/{matricula}", tags=["Professor"])
 def get_professor(matricula: str, usuario_service: UsuarioService = Depends(get_usuario_service)):
     try:
-        return usuario_service.get_teacher_by_matricula(matricula) #mudar depois
+        return usuario_service.get_teacher_by_matricula(matricula) 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
@@ -64,3 +64,23 @@ def is_user_active(matricula: str, usuario_service: UsuarioService = Depends(get
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) 
 
+
+@router.get("/enviar_email_recuperacao", tags=["Usuário"])
+def send_recovery_email(email:str,  req: Request, usuario_service: UsuarioService = Depends(get_usuario_service)):
+    try:
+        usuario_service.send_recovery_email(email, req)
+        return {"msg": "Email enviado com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/redefinir_senha", tags=["Usuário"])
+def recovery_password_validate(
+    data: TokenPasswordResetRequest,
+    request: Request,
+    usuario_service: UsuarioService = Depends(get_usuario_service)
+):
+    try:
+        usuario_service.forgot_password(data, request)
+        return {"msg": "Senha redefinida com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

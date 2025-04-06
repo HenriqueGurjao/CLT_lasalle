@@ -114,3 +114,6 @@ class ProjetoFinalService:
                 return response.json()
         except httpx.HTTPStatusError as exc:
             raise HTTPException(status_code=exc.response.status_code, detail=str(exc))
+        
+    def get_pdf_path_by_id(self, projeto_id: int):
+        return self.projeto_repository.get_projeto_by_id(projeto_id=projeto_id, colunas=['pdf_path'])

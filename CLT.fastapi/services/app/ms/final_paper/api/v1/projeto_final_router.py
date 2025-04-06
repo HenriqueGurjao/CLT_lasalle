@@ -7,7 +7,9 @@ from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, Projeto
 from fastapi import APIRouter, File, Form, HTTPException, Query, Depends, UploadFile
 from ....user.services.usuario_services import UsuarioRepository, UsuarioService
 from ....course.services.course_service import CursoService, CursoRepository
+from fastapi.responses import FileResponse
 import json
+import os
 
 router = APIRouter()
 
@@ -93,3 +95,17 @@ async def listar_projetos_finais(
         return projetos
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/download-pdf/{id}", tags=["Projeto_final"])
+async def download_pdf(id: int, projeto_service: ProjetoFinalService = Depends(get_projeto_service)):
+    try:
+        
+        pdf = projeto_service.get_pdf_path_by_id(id)
+        pdf_path = pdf['pdf_path']
+
+        if not os.path.exists(pdf_path):
+            raise HTTPException(status_code=404, detail="Arquivo não encontrado.")
+        
+        return FileResponse(pdf_path, media_type='application/pdf', filename=os.path.basename(pdf_path))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao tentar baixar o PDF: {str(e)}")

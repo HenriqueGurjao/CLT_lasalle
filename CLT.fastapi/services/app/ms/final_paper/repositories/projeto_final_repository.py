@@ -179,3 +179,41 @@ class ProjetoFinalRepository:
             "total_pages": total_pages
         }
         
+    def get_projeto_by_id(self, projeto_id: int, colunas: List[str]):
+        if not colunas:
+            raise HTTPException(status_code=400, detail="É necessário informar ao menos uma coluna para buscar.")
+
+        conn = get_db_connection()
+        try:
+            colunas_validas = [
+                'id', 'titulo', 'status', 'pdf_path', 'data_registro', 'data_apresentacao'
+            ]
+            
+            colunas_incluidas = [coluna for coluna in colunas if coluna in colunas_validas]
+            
+            if not colunas_incluidas:
+                raise HTTPException(status_code=400, detail="Nenhuma coluna válida foi informada.")
+
+            colunas_selecionadas = ", ".join(colunas_incluidas)
+            query = f"""
+                SELECT {colunas_selecionadas}
+                FROM CLT_LASALLE.PROJETO_FINAL
+                WHERE id = %s
+            """
+            
+            with conn.cursor() as cursor:
+                cursor.execute(query, (projeto_id,))
+                projeto = cursor.fetchone()
+
+                if not projeto:
+                    raise HTTPException(status_code=404, detail="Projeto não encontrado")
+
+                resultado = {colunas_incluidas[i]: projeto[i] for i in range(len(colunas_incluidas))}
+
+                return resultado
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao buscar projeto: {e}")
+        finally:
+            conn.close()
+

@@ -1,6 +1,7 @@
 from typing import List, Optional
 from fastapi import HTTPException
 from app.db.connection import get_db_connection
+from .project_status import project_status
 
 class ProjetoFinalRepository:
     def criar_projeto_final(self, curso_id: int, orientador_id: int, aluno_id: int, titulo: str, status: str, pdf_path: str = None):
@@ -37,7 +38,7 @@ class ProjetoFinalRepository:
             conn.close()
 
             
-    def listar_projetos(self, cursos_id: Optional[str] = None, status: Optional[List[str]] = None, aluno_id: Optional[List[int]] = None, orientador_id: Optional[List[int]] = None, pagina: Optional[List[int]] = None, itens_por_pagina: Optional[List[int]] = None, pesquisa: Optional[str] = None, periodos: Optional[str] = None):
+    def listar_projetos(self, cursos_id: Optional[str] = None, status: Optional[List[str]] = None, aluno_id: Optional[List[int]] = None, orientador_id: Optional[List[int]] = None, pagina: Optional[List[int]] = None, itens_por_pagina: Optional[List[int]] = None, pesquisa: Optional[str] = None, periodos: Optional[str] = None, status_projeto: project_status = project_status.APROVADO):
         conn = get_db_connection()
         
 
@@ -59,6 +60,7 @@ class ProjetoFinalRepository:
             INNER JOIN CLT_LASALLE.usuarios u_aluno ON a.usuario_id = u_aluno.id 
             INNER JOIN CLT_LASALLE.professores o ON P.orientador_id = o.id
             INNER JOIN CLT_LASALLE.usuarios u_orientador ON o.usuario_id = u_orientador.id
+            WHERE p.status {"=" if status_projeto == project_status.APROVADO else "!="} 'APROVADO'
         """
 
         query_contagem = f"""
@@ -72,10 +74,11 @@ class ProjetoFinalRepository:
             INNER JOIN CLT_LASALLE.usuarios u_aluno ON a.usuario_id = u_aluno.id 
             INNER JOIN CLT_LASALLE.professores o ON P.orientador_id = o.id
             INNER JOIN CLT_LASALLE.usuarios u_orientador ON o.usuario_id = u_orientador.id
+            WHERE p.status {"=" if status_projeto == project_status.APROVADO else "!="} 'APROVADO'
         """
 
         if pesquisa or cursos_id or periodos:
-            termo = """    WHERE 
+            termo = """    AND
                 ("""
             query += termo
             query_contagem += termo
@@ -143,7 +146,7 @@ class ProjetoFinalRepository:
         # query_contagem += termo
         query += termo
 
-        print(pesquisa, cursos_id, periodos)
+        print(query)
         try:
             with conn.cursor() as cursor:
                 cursor.execute(query, tuple(params))

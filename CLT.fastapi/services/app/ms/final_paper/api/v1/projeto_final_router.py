@@ -4,9 +4,10 @@ from app.ms.final_paper.repositories.projeto_final_repository import ProjetoFina
 from app.ms.final_paper.repositories.tag_repository import TagRepository 
 from app.ms.final_paper.services.tag_service import TagService
 from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, ProjetoFinalCreateSchema
-from fastapi import APIRouter, File, Form, HTTPException, Query, Depends, UploadFile
+from fastapi import APIRouter, Body, File, Form, HTTPException, Query, Depends, UploadFile
 from ....user.services.usuario_services import UsuarioRepository, UsuarioService
 from ....course.services.course_service import CursoService, CursoRepository
+from fastapi.openapi.models import Schema
 from fastapi.responses import FileResponse
 import json
 import os
@@ -31,9 +32,19 @@ def get_projeto_service(
     tag_service = TagService(tag_repository)
     return ProjetoFinalService(projeto_repository, tag_service, curso_service, usuario_service)
 
+def projeto_schema_dep():
+    """
+    Só serve para exibir o schema no Swagger
+    """
+    return ProjetoFinalCreateSchema.model_json_schema()
+
 
 @router.post("/professor/projeto-final", tags=["Projeto_final"])
 async def criar_projeto_final(
+    # projeto_data_example: ProjetoFinalCreateSchema = Body(
+    #     default=..., 
+    #     description="Schema de exemplo para documentação apenas"
+    # ),
     projeto_data: str = Form(...),  
     pdf_file: UploadFile = File(...),
     projeto_service: ProjetoFinalService = Depends(get_projeto_service),

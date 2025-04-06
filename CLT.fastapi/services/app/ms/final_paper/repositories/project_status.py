@@ -1,0 +1,8 @@
+from enum import Enum
+
+class project_status(Enum):
+  APROVADO = "APROVADO"
+  REPROVADO = "REPROVADO"
+  EM_DESENVOLVIMENTO = "EM_DESENVOLVIMENTO"
+  PAUSADO = "PAUSADO"
+  TRANCADO = "TRANCADO"

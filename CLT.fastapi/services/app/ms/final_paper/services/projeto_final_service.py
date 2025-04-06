@@ -11,6 +11,7 @@ import sys
 import traceback
 import shutil
 from datetime import datetime
+from ....utils.pdf.pdf import salvar_capa_pdf
 
 class ProjetoFinalService:
     def __init__(
@@ -62,6 +63,8 @@ class ProjetoFinalService:
             projeto_id = self.projeto_repository.criar_projeto_final(
                 curso_id, orientador_id, aluno_id, titulo, status, pdf_path
             )
+
+            path_capa = salvar_capa_pdf(pdf_path)
         except Exception as e:
             if os.path.exists(pdf_path):
                 os.remove(pdf_path)
@@ -98,15 +101,14 @@ class ProjetoFinalService:
         return self.projeto_repository.listar_projetos(cursos_id, status, aluno_id, orientador_id, pagina, itens_por_pagina, pesquisa, periodos)
     
     async def get_user_from_api(self, matr: str, access_token: str):
-        url = "http://localhost:8000/api/v1/aluno/"+matr  # Substitua com o URL da API externa
+        url = "http://localhost:8000/api/v1/aluno/"+matr  
 
         cookies = {
-            "auth_token": access_token  # Definindo o token como um cookie
+            "auth_token": access_token  
         }
 
         try:
             async with httpx.AsyncClient() as client:
-                # Envia o cookie com o access_token
                 response = await client.get(url, cookies=cookies)
                 response.raise_for_status()  
                 return response.json()

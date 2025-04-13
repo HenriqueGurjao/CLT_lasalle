@@ -17,6 +17,7 @@ export interface ProjetoFinal {
   orientador_nome: string;
   data_registro: string;
   status: string;
+  banner_path: string;
 }
 
 // const moreTccs: Tcc[] = [

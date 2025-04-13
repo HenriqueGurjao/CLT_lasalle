@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CircleNotch } from "phosphor-react";
+import Image from "next/image";
+
 
 interface ListTccsProps {
   itens_por_pagina: number;
@@ -56,7 +58,7 @@ export const ListTccs = ({
   // }, []);
 
   return (
-    <ul className="p-4 grid grid-cols-4 gap-2 ">
+    <ul className="p-4 grid grid-cols-5 gap-2 ">
       {projetos ? (
         projetos.map((tcc, index) => (
           <li key={index}>
@@ -64,11 +66,24 @@ export const ListTccs = ({
               <CardHeader className="h-28 overflow-y-auto">
                 <CardTitle>{tcc.titulo}</CardTitle>
               </CardHeader>
-              <CardContent className="flex items-center justify-center bg-[url('/Untitled.jpg')] h-72 bg-cover bg-center border"></CardContent>
-              <CardFooter className="flex items-center justify-center gap-2 pt-5">
+              <CardContent className="flex items-center justify-center h-72 border relative">
+              {tcc.banner_path ? (
+                <Image
+                  src={tcc.banner_path}
+                  alt={`Banner do projeto ${tcc.titulo}`}
+                  // layout="fill" 
+                  width={150}
+                  height={350}
+                  // objectFit="cover"
+                />
+              ) : (
+                <div className="text-center">Sem imagem</div>
+              )}
+            </CardContent>
+              {/* <CardFooter className="flex items-center justify-center gap-2 pt-5">
                 <Button>Download</Button>
                 <Button>Informações</Button>
-              </CardFooter>
+              </CardFooter> */}
               {/* <CardFooter className="overflow-x-auto max-h-20 p-4">
               <ul>
                 <li>

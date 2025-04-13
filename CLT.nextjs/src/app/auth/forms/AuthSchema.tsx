@@ -49,7 +49,6 @@ export function AuthForm() {
       setRole(data.role);
       setIsActive(data.is_active);
       localStorage.setItem("matricula", values.matricula);
-      console.log(data)
 
       router.push("/inicio");
     } catch (error) {

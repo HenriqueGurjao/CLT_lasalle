@@ -30,25 +30,33 @@ class UsuarioService:
     def get_user_permissions(self, user):
         return self.usuario_repository.find_user_permissions(user.matricula)
     
-    def update_user_password(self, matricula, password, new_password):
-        senha = self.get_user_password_by_matricula(matricula) 
-        password_check = verify_password(password, senha[0])
-
-        if not password_check:
-            raise Exception("Senha invalida")
+    def update_user_password(self, matricula, password, new_password, request: Request):
         
-        if new_password == password:
-            raise Exception("Nova senha não pode ser igual a senha atual")
+        is_account_activate = "/ativar_conta" in str(request.url.path)
+        print("ativacao? ",is_account_activate, matricula)
+        senha  = None
+        if not is_account_activate:
+            senha = self.get_user_password_by_matricula(matricula) 
+            password_check = verify_password(password, senha[0])
+            if not password_check:
+                raise Exception("Senha invalida")
+            if new_password == password:
+                raise Exception("Nova senha não pode ser igual a senha atual")
+        else:
+            password_check = True
+
+        
         
         if len(new_password) < 8:
             raise Exception("Nova senha deve ter no mínimo 8 caracteres")
         
         if senha and password_check:
+            print("chegou na chamada pra trocar senha")
             return self.usuario_repository.update_user_password(matricula, new_password)
         
     
-    def activate_account(self, matricula, password, new_password):
-        self.update_user_password(matricula, password, new_password)
+    def activate_account(self, matricula:str, password:str , new_password: str, request: Request):
+        self.update_user_password(matricula, password, new_password, request)
         return self.usuario_repository.activate_account(matricula)
     
     def is_account_active(self, matricula):
@@ -59,7 +67,7 @@ class UsuarioService:
         token = create_access_token({"sub": usuario[1], "type": "recovery", "user-agent": request.headers.get("User-Agent")})
         body = body_email_templates.recovery_password_email_body(
             nome=usuario[2],
-            link=f"https://localhost:3000/redefinir-senha?token={encrypt_token(token)}"
+            link=f"http://localhost:3000/redefinir_senha?token={encrypt_token(token)}"
         )
 
         email_sender = EmailSender()

@@ -14,11 +14,12 @@ import Image from "next/image";
 export const Header = () => {
   const path = usePathname();
   const { setUser } = useAuth();
+  const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta",  "/", "/redefinir_senha"];
 
-  const matriculaLocalStorage = localStorage.getItem("matricula");
-
+  
   useEffect(() => {
     const fetchData = async () => {
+      const matriculaLocalStorage = localStorage.getItem("matricula");
 
       const redirectUrl = matriculaLocalStorage == '00500500' ? 'professor' : matriculaLocalStorage?.startsWith('005') ? 'aluno' : 'aluno';
       const endpoint = `http://localhost:8000/api/v1/${redirectUrl}/${matriculaLocalStorage}`
@@ -41,8 +42,11 @@ export const Header = () => {
 
     }
 
-    fetchData();
-  }, [matriculaLocalStorage, path, setUser]);
+    if(!rotasIgnoradas.some(r => path.startsWith(r))){
+      fetchData();
+    }
+    
+  }, [path, rotasIgnoradas, setUser]);
 
   return (
     <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white bg-gray-200 overflow-hidden pl-6">
@@ -53,6 +57,7 @@ export const Header = () => {
             alt="imagem tela de login" 
             width={300}   
             height={300} 
+            priority
           />
         </a>
         {/* <ul>

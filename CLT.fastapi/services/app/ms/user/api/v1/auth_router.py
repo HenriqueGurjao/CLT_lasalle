@@ -51,4 +51,8 @@ def logout(response: Response):
 
 @router.post("/auth/refresh", tags=["Autentificacao"])
 async def refresh(request: Request):
+    referer = request.headers.get("referer") or ""
+    print(referer)
+    if "recuperar_senha" in referer:
+        return {"detail": "ok"}
     return refresh_token(request)

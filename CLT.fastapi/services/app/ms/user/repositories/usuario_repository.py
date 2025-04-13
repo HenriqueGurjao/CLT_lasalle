@@ -211,6 +211,7 @@ class UsuarioRepository:
             with conn.cursor() as cursor:
                 cursor.execute("UPDATE CLT_LASALLE.usuarios SET senha = %s WHERE matricula = %s", (hash_password(new_password), matricula))
                 conn.commit()
+            print("Senha atualizada com sucesso")
         except Exception as e:
             conn.rollback()  
             raise Exception(f"Erro ao atualizar senha: {str(e)}")

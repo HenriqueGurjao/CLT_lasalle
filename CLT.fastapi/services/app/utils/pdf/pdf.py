@@ -6,7 +6,7 @@ def salvar_capa_pdf(pdf_path: str) -> str:
     try:
         doc = fitz.open(pdf_path)
         page = doc.load_page(0) 
-        pix = page.get_pixmap(dpi=150)  
+        pix = page.get_pixmap(dpi=300)  
 
         output_dir = os.path.dirname(pdf_path)  
         nome_arquivo = os.path.splitext(os.path.basename(pdf_path))[0]  

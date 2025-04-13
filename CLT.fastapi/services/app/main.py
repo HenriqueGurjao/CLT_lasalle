@@ -11,12 +11,16 @@ from app.middleware.auth_middleware import validate_token, check_user_permission
 from app.ms.user.services.usuario_services import UsuarioService
 from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from app.ms.user.domain.usuario import Professor
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI(
     title="API CLT de Usuários",
     description="API de gerenciamento de usuários",
     version="1.0.0",
 )
+
+app.mount("/media", StaticFiles(directory=r"C:\projetos"), name="media")
 
 origins = [
     "http://localhost:3000",
@@ -36,16 +40,20 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     try:
-        if request.url.path  in [
-            "/docs", 
-            "/redoc", 
-            "/api/v1/auth/login", 
-            "/openapi.json", 
-            "/api/v1/auth/logout", 
-            "/api/v1/auth/refresh", 
-            "/api/v1/enviar_email_recuperacao",
-            "/api/v1/redefinir_senha"
-        ] or request.method == "OPTIONS":
+        if (
+            request.url.path.startswith("/media/")
+            or request.url.path in [
+                "/docs", 
+                "/redoc", 
+                "/api/v1/auth/login", 
+                "/openapi.json", 
+                "/api/v1/auth/logout", 
+                "/api/v1/auth/refresh", 
+                "/api/v1/enviar_email_recuperacao",
+                "/api/v1/redefinir_senha"
+            ]
+            or request.method == "OPTIONS"
+        ):
             try:
                 return await call_next(request)
             except Exception as e:

@@ -2,8 +2,14 @@ from typing import List, Optional
 from fastapi import HTTPException
 from app.db.connection import get_db_connection
 from .project_status import project_status
+import urllib.parse
+import os 
+# from ....utils.banner.gen_banners_url import 
 
 class ProjetoFinalRepository:
+    def __init__(self):
+        self.base_url = os.getenv("BASE_URL", "http://localhost:8000")
+
     def criar_projeto_final(self, curso_id: int, orientador_id: int, aluno_id: int, titulo: str, status: str, pdf_path: str = None):
         conn = get_db_connection()
         try:
@@ -21,6 +27,25 @@ class ProjetoFinalRepository:
             raise HTTPException(status_code=500, detail=f"Erro ao criar projeto final: {e}")
         finally:
             conn.close()
+    
+    def construir_banner_url(self, pdf_path: str) -> Optional[str]:
+        if not pdf_path:
+            return None
+
+        try:
+            dir_path, filename = os.path.split(pdf_path)
+            name, _ = os.path.splitext(filename)
+            banner_filename = f"{name}.jpg"
+            banner_full_path = os.path.join(dir_path, banner_filename)
+
+            relative_path = os.path.relpath(banner_full_path, r"C:\projetos")
+            relative_path = relative_path.replace("\\", "/")
+            encoded_path = urllib.parse.quote(relative_path)
+
+            banner_url = f"{self.base_url}/media/{encoded_path}"
+            return banner_url
+        except Exception:
+            return None
 
     def associar_tag_projeto(self, projeto_id: int, tag_id: int):
         conn = get_db_connection()
@@ -51,7 +76,8 @@ class ProjetoFinalRepository:
                 c.nome as curso_nome, 
                 u_aluno.nome as aluno_nome, 
                 u_orientador.nome as orientador_nome,
-                p.data_apresentacao
+                p.data_apresentacao,
+                REPLACE(p.pdf_path, '.pdf', '_capa.jpg') AS banner_path
             FROM CLT_LASALLE.PROJETO_FINAL P
             LEFT JOIN CLT_LASALLE.TAG_PROJETO TP ON TP.ID_PROJETO = P.ID
             LEFT JOIN CLT_LASALLE.TAG T ON T.ID = TP.ID_TAG
@@ -175,7 +201,8 @@ class ProjetoFinalRepository:
                     "curso_nome": projeto[4],
                     "aluno_nome": projeto[5],
                     "orientador_nome": projeto[6],
-                    "data_apresentacao": projeto[7]
+                    "data_apresentacao": projeto[7],
+                    "banner_path": self.construir_banner_url(projeto[8])
                 }
                 for projeto in projetos
             ],

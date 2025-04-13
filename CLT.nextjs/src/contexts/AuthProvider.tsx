@@ -35,18 +35,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState<string>("");
   const [firstVisit, setFirstVisit] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const path = usePathname();
   const [user, setUser] = useState<UserProps | null>(null);
   const [matricula, setMatricula] = useState<string>("");
   const [isActive, setIsActive] = useState(false);
+  const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta",  "/", "/redefinir_senha"];
 
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      setLoading(true); 
       const isFirstVisit = !sessionStorage.getItem("visited");
       const localMatricula = localStorage.getItem("matricula");
+      setMatricula(localMatricula ?  localMatricula : "")
 
       const checkAuth = async () => {
         try {
@@ -54,15 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             method: "POST",
             credentials: "include",
           });
-
-          const userActive = await fetch("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
-            method: "GET",
-            credentials: "include",
-          })
-          
-          const isUserActive = await userActive.json() 
-          console.log("usuario ativo: ", isUserActive)
-          setIsActive(isActive)
 
           if (response.ok) {
             const data = await response.json();
@@ -91,32 +85,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       };
 
+      const needActivateAccount = async () => {
+        if(rotasIgnoradas.some(r => path.startsWith(r))){
+          return 
+        }
+        const userActive = await fetch("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
+          method: "GET",
+          credentials: "include",
+        })
+        
+        const isUserActive = await userActive.json() 
+        setIsActive(isUserActive)
+        console.log(isUserActive)
+        if(!isUserActive) {
+          router.push("/ativar_conta")
+        }
+        else {
+          router.push("/inicio")
+        }
+        return isActive
+      }
+
       if (isFirstVisit) {
         sessionStorage.setItem("visited", "true");
         setLoading(true);
         setFirstVisit(true);
 
-        setTimeout(() => {
-          checkAuth();
-        }, 3000); 
+        checkAuth();
+        // setTimeout(() => {
+        // }, 2000); 
       } else if (path === "/auth") {
         setLoading(true);
-        setTimeout(() => {
-          checkAuth();
-        }, 3000);
+        checkAuth();
+        // setTimeout(() => {
+        // }, 3000);
       } else {
+        needActivateAccount();
         setLoading(false);
       }
     } 
-  }, [path, router]);
+  }, [isActive, path, router]);
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    const matr = localStorage.getItem("matricula") || "";
-    if( matr === "" && path !== "/auth") {
-      window.location.href = "/auth";
-    }
-  }, [path])
+  //   const matr = localStorage.getItem("matricula") || "";
+  //   if( matr === "" && path !== "/auth" && path !== '/redefinir_senha') {
+  //     console.log("Redirecionando para a página de autenticação");
+  //     // window.location.href = "/auth";
+  //   }
+  // }, [path])
 
   const logout = async () => {
     try {

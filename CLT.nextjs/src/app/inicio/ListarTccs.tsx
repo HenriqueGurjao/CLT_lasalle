@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CircleNotch } from "phosphor-react";
 import Image from "next/image";
+import Link from "next/link";
 
 
 interface ListTccsProps {
@@ -40,72 +41,57 @@ export const ListTccs = ({
     setFlipped(flipped === index ? null : index);
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetchWithAuth(
-  //         "http://localhost:8000/api/v1/projetos?pagina=1&itens_por_pagina=20"
-  //       );
-  //       const data = await response?.json();
-  //       console.log(data);
-  //       setProjetos(data);
-  //     } catch (error) {
-  //       console.error("Error fetching tccs:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
   return (
     <ul className="p-4 grid grid-cols-5 gap-2 ">
       {projetos ? (
         projetos.map((tcc, index) => (
-          <li key={index}>
-            <Card className="min-h-full flex flex-col justify-between pb-2 ">
-              <CardHeader className="h-28 overflow-y-auto">
-                <CardTitle>{tcc.titulo}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center h-72 border relative">
-              {tcc.banner_path ? (
-                <Image
-                  src={tcc.banner_path}
-                  alt={`Banner do projeto ${tcc.titulo}`}
-                  // layout="fill" 
-                  width={150}
-                  height={350}
-                  // objectFit="cover"
-                />
-              ) : (
-                <div className="text-center">Sem imagem</div>
-              )}
-            </CardContent>
-              {/* <CardFooter className="flex items-center justify-center gap-2 pt-5">
-                <Button>Download</Button>
-                <Button>Informações</Button>
-              </CardFooter> */}
-              {/* <CardFooter className="overflow-x-auto max-h-20 p-4">
-              <ul>
-                <li>
-                  <span className="font-bold">Ano:</span>
-                  {tcc.ano}
-                </li>
-                <li>
-                  <span className="font-bold">Curso:</span>
-                  {tcc.curso}
-                </li>
-                <li className="overflow-x-auto">
-                  <span className="font-bold">Tags:</span>
-                  {tcc.tags.map((tag, index) => (
-                    <Badge key={index} className="ml-2">
-                      {tag}
-                    </Badge>
-                  ))}
-                </li>
-              </ul>
-            </CardFooter> */}
-            </Card>
+          <li key={index} className="relative">
+              <Card className="min-h-full flex flex-col justify-between pb-2 relative group overflow-hidden">
+                <CardHeader className="h-28 overflow-y-auto">
+                  <CardTitle>{tcc.titulo}</CardTitle>
+                </CardHeader>
+
+                <CardContent className="flex items-center justify-center h-72 border relative overflow-hidden">
+                  {tcc.banner_path ? (
+                    <Image
+                      src={tcc.banner_path}
+                      alt={`Banner do projeto ${tcc.titulo}`}
+                      fill
+                      style={{ objectFit: "contain" }}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority
+                    />
+                  ) : (
+                    <div className="text-center">Sem imagem</div>
+                  )}
+
+                  {/* Overlay animado: de cima pra baixo */}
+                  <div
+                    className="
+                      absolute inset-0 bg-white bg-opacity-70 text-black p-4 
+                      opacity-0 translate-y-[-100%] 
+                      group-hover:opacity-100 group-hover:translate-y-0
+                      transition-all duration-300 ease-in-out 
+                      flex flex-col justify-center items-center text-sm text-center
+                    "
+                  >
+                    <p>
+                      <span className="font-bold">Ano:</span> {tcc.data_registro}
+                    </p>
+                    <p>
+                      <span className="font-bold">Curso:</span> {tcc.curso_nome}
+                    </p>
+                    <Link className="border" href={`http://localhost:8000/api/v1/download-pdf/${tcc.id}`} download>
+                      <Button className="border">
+                        Clique aqui para baixar
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            {/* </Link> */}
           </li>
+
         ))
       ) : (
         <div className="fixed top-1/2 left-1/2">

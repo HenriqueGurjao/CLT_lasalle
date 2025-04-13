@@ -96,6 +96,7 @@ export default function Home() {
 
       const response = await fetchWithAuth(endpoint);
       const data = await response?.json();
+      console.log(data)
       setProjetos(data.projetos);
       setPagesNumber(data.total_pages)
     } catch (error) {

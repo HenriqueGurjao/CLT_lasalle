@@ -16,7 +16,8 @@ class AuthService:
         if usuario and verify_password(password, usuario[0]):
             token = create_access_token({"sub": usuario[1], "role": permission, "user-agent": request.headers.get("User-Agent")})
             refresh_token = create_refresh_token({"sub": usuario[1], "role": permission, "user-agent": request.headers.get("User-Agent")})
-            return [token, permission, refresh_token]
+            user_active = self.usuario_repository.is_user_active(matricula)
+            return [token, permission, refresh_token, user_active]
         raise HTTPException(status_code=400, detail="Senha incorreta")  
 
 

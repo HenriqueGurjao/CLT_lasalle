@@ -45,12 +45,19 @@ export function AuthForm() {
       }
 
       const data = response && await response.json();
+      console.log(data)
       setMatricula(values.matricula);
       setRole(data.role);
       setIsActive(data.is_active);
       localStorage.setItem("matricula", values.matricula);
 
-      router.push("/inicio");
+      console.log(data.is_active)
+      if(data.is_active === false) {
+        router.push("/ativar_conta");
+      }
+      else{
+        router.push("/inicio");
+      }
     } catch (error) {
       alert("Erro interno no servidor: " + error);
     }

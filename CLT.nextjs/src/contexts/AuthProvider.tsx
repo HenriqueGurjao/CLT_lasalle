@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProps | null>(null);
   const [matricula, setMatricula] = useState<string>("");
   const [isActive, setIsActive] = useState(false);
-  const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta",  "/", "/redefinir_senha"];
+  const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta", "/redefinir_senha"];
 
 
   useEffect(() => {
@@ -71,7 +71,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } else {
             const data = await response.json();
-            console.log(data);
             setIsAuthenticated(false);
             router.push("/auth");
           }
@@ -86,7 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       const needActivateAccount = async () => {
-        if(rotasIgnoradas.some(r => path.startsWith(r))){
+        console.log("chamada de need activate", path)
+        if (rotasIgnoradas.some(r => r !== "/" && path.startsWith(r)) || path === "/"){
+          console.log("chamada de need activate return")
           return 
         }
         const userActive = await fetch("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
@@ -94,9 +95,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           credentials: "include",
         })
         
+        console.log(userActive)
         const isUserActive = await userActive.json() 
         setIsActive(isUserActive)
-        console.log(isUserActive)
         if(!isUserActive) {
           router.push("/ativar_conta")
         }
@@ -106,23 +107,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return isActive
       }
 
+      // if(rotasIgnoradas.some(r => path.startsWith(r))){
+      //   setLoading(false)
+      //   return 
+      // }
+
       if (isFirstVisit) {
         sessionStorage.setItem("visited", "true");
         setLoading(true);
         setFirstVisit(true);
 
         checkAuth();
-        // setTimeout(() => {
-        // }, 2000); 
-      } else if (path === "/auth") {
+      } 
+      if (path === "/auth") {
         setLoading(true);
         checkAuth();
-        // setTimeout(() => {
-        // }, 3000);
       } else {
-        needActivateAccount();
         setLoading(false);
       }
+      needActivateAccount();
     } 
   }, [isActive, path, router]);
 

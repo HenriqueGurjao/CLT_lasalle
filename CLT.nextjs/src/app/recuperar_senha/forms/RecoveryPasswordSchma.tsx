@@ -19,8 +19,6 @@ export function useRecoveryPassword() {
     },
   });
 
-  const router = useRouter(); 
-
   const [formLoading, setFormLoading] = useState<boolean | null>(null);
 
   async function onSubmit(values: z.infer<typeof RecoveryPasswordSchema>) {

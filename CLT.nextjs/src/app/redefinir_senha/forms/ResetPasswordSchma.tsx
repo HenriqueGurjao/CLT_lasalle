@@ -3,14 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation"; 
+import { useEffect, useState } from "react";
 import { ResetPasswordSchema } from "./ResetPasswordForms";
 import { toast } from "@/hooks/use-toast";
 
-export function useResetPassword() {
-  const searchParams = useSearchParams(); 
-  const tokenFromUrl = searchParams.get("token"); 
+export function useResetPassword(tokenFromUrl: string | null) {
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -21,6 +18,8 @@ export function useResetPassword() {
     },
   });
 
+  const [formLoading, setFormLoading] = useState<boolean | null>(null);
+
   useEffect(() => {
     if (tokenFromUrl) {
       form.setValue("token", tokenFromUrl);
@@ -29,6 +28,7 @@ export function useResetPassword() {
 
   async function onSubmit(values: z.infer<typeof ResetPasswordSchema>) {
     try {
+      setFormLoading(true);
       const response = await fetch(`http://localhost:8000/api/v1/redefinir_senha`, {
         method: "POST",
         headers: {
@@ -51,13 +51,14 @@ export function useResetPassword() {
           description: errorMessage,
           variant: "destructive",
         });
+        setFormLoading(null);
         return;
       }
 
       toast({
         title: "Senha redefinida com sucesso.",
       });
-
+      setFormLoading(false);
       setTimeout(() => {
         window.location.href = "/auth";
       }, 2000);
@@ -73,5 +74,6 @@ export function useResetPassword() {
   return {
     form,
     onSubmit,
+    formLoading
   };
 }

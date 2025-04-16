@@ -53,6 +53,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const checkAuth = async () => {
         try {
+          if (rotasIgnoradas.some(r => r !== "/" && path.startsWith(r)) || path === "/"){
+            console.log("chamada de need activate return")
+            return 
+          }
           const response = await fetch("http://localhost:8000/api/v1/auth/refresh", {
             method: "POST",
             credentials: "include",

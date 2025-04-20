@@ -97,6 +97,7 @@ export const CadProjetoFormFields = () => {
     form.setValue("curso_id", value);
   };
 
+
   return (
     <Card>
       <CardHeader>
@@ -229,6 +230,27 @@ export const CadProjetoFormFields = () => {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="pdf_file"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            field.onChange(file); 
+                          }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -18,6 +18,7 @@ export interface ProjetoFinal {
   data_registro: string;
   status: string;
   banner_path: string;
+  tags: string[];
 }
 
 // const moreTccs: Tcc[] = [

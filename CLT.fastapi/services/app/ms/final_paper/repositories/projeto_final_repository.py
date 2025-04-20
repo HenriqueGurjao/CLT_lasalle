@@ -77,7 +77,8 @@ class ProjetoFinalRepository:
                 u_aluno.nome as aluno_nome, 
                 u_orientador.nome as orientador_nome,
                 p.data_apresentacao,
-                REPLACE(p.pdf_path, '.pdf', '_capa.jpg') AS banner_path
+                REPLACE(p.pdf_path, '.pdf', '_capa.jpg') AS banner_path,
+                STRING_AGG(T.TITULO, ', ') AS tags
             FROM CLT_LASALLE.PROJETO_FINAL P
             LEFT JOIN CLT_LASALLE.TAG_PROJETO TP ON TP.ID_PROJETO = P.ID
             LEFT JOIN CLT_LASALLE.TAG T ON T.ID = TP.ID_TAG
@@ -202,7 +203,8 @@ class ProjetoFinalRepository:
                     "aluno_nome": projeto[5],
                     "orientador_nome": projeto[6],
                     "data_apresentacao": projeto[7],
-                    "banner_path": self.construir_banner_url(projeto[8])
+                    "banner_path": self.construir_banner_url(projeto[8]),
+                    "tags": projeto[9].split(", ") if projeto[9] else []
                 }
                 for projeto in projetos
             ],

@@ -41,10 +41,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProps | null>(null);
   const [matricula, setMatricula] = useState<string>("");
   const [isActive, setIsActive] = useState(false);
-  const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta", "/redefinir_senha"];
-
-
+  
+  
   useEffect(() => {
+    const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta", "/redefinir_senha"];
     if (typeof window !== "undefined") {
       setLoading(true); 
       const isFirstVisit = !sessionStorage.getItem("visited");

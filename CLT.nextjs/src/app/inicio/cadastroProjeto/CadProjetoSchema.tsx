@@ -18,24 +18,39 @@ export function CadProjetoForm() {
       orientador_matr: "",
       status:  Status.EM_DESENVOLVIMENTO,
       titulo: "",
+      pdf_file: undefined,
+      tags: [],
     },
   });
 
   async function onSubmit(values: z.infer<typeof CadProjetoFormSchema>) {
 
     try {
+      const projetoData = {
+        aluno_matr: values.aluno_matr,
+        curso_id: values.curso_id,
+        orientador_matr: values.orientador_matr,
+        status: values.status,
+        titulo: values.titulo,
+        pdf_file: values.pdf_file, // Isso já é tratado como file
+        tags: values.tags, // Aqui já são enviados como objetos
+      };
+      
+      // Convertendo tudo para string JSON
+      const formData = new FormData();
+      formData.append("projeto_data", JSON.stringify(projetoData)); // Agora é uma string JSON
+      
+      formData.append("pdf_file", values.pdf_file); // Lembre-se de que o arquivo já é tratado com File
+      
+      // Enviando a requisição
       const response = await fetch("http://localhost:8000/api/v1/professor/projeto-final", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-        credentials: "include", 
+        body: formData,
+        credentials: "include",
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null); // Garante que não vai quebrar caso o JSON seja inválido
   
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.detail || `Erro ao cadastrar (código ${response.status}).`;
   
         toast({
@@ -46,14 +61,13 @@ export function CadProjetoForm() {
   
         return;
       }
+  
+      // const data = response && await response.json();
 
-      const data = response && await response.json();
-
-      console.log(data);
-
+  
       toast({
         title: "Projeto cadastrado com sucesso!",
-      })
+      });
     } catch (error) {
       toast({
         title: "Erro interno no servidor: " + error,

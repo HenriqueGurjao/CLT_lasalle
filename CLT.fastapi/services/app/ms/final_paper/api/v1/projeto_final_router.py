@@ -51,6 +51,7 @@ async def criar_projeto_final(
     usuario_service: UsuarioService = Depends(get_usuario_service)
 ):
 
+    print(projeto_data)
     try:
         projeto_data = json.loads(projeto_data)
         projeto_data = ProjetoFinalCreateSchema(**projeto_data)

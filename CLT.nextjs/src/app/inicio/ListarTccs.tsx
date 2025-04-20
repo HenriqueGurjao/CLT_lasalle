@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CircleNotch } from "phosphor-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 
 interface ListTccsProps {
@@ -42,12 +43,12 @@ export const ListTccs = ({
   };
 
   return (
-    <ul className="p-4 grid grid-cols-5 gap-2 ">
+    <ul className="p-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 gap-2 ">
       {projetos ? (
         projetos.map((tcc, index) => (
           <li key={index} className="relative">
               <Card className="min-h-full flex flex-col justify-between pb-2 relative group overflow-hidden">
-                <CardHeader className="h-28 overflow-y-auto">
+                <CardHeader className="h-24 overflow-y-auto">
                   <CardTitle>{tcc.titulo}</CardTitle>
                 </CardHeader>
 
@@ -68,24 +69,42 @@ export const ListTccs = ({
                   {/* Overlay animado: de cima pra baixo */}
                   <div
                     className="
-                      absolute inset-0 bg-white bg-opacity-70 text-black p-4 
+                      absolute inset-0 bg-white bg-opacity-90 text-black p-4 
                       opacity-0 translate-y-[-100%] 
                       group-hover:opacity-100 group-hover:translate-y-0
                       transition-all duration-300 ease-in-out 
-                      flex flex-col justify-center items-center text-sm text-center
+                      flex flex-col justify-start items-start text-sm text-center
                     "
                   >
                     <p>
-                      <span className="font-bold">Ano:</span> {tcc.data_registro}
+                      <span className="font-bold">Titulo:</span> {tcc.titulo}
                     </p>
                     <p>
                       <span className="font-bold">Curso:</span> {tcc.curso_nome}
                     </p>
-                    <Link className="border" href={`http://localhost:8000/api/v1/download-pdf/${tcc.id}`} download>
-                      <Button className="border">
-                        Clique aqui para baixar
-                      </Button>
-                    </Link>
+                    <p>
+                      <span className="font-bold">Orientador:</span> {tcc.orientador_nome}
+                    </p>
+                    <p>
+                      <span className="font-bold">Data:</span> {new Date(tcc.data_registro).toLocaleDateString()}
+                    </p>
+                    <p>
+                      <span className="font-bold">Curso:</span> {tcc.curso_nome}
+                    </p>
+                    <div className="mt-1 overflow-y-auto w-full h-full flex justify-start items-start">
+                      <span className="font-bold">Tags:</span> {tcc.tags.map((tag, index) => (
+                        <Badge key={index} className="text-xs bg-blue-700 rounded-full px-2 py-0 mr-1">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="w-full flex items-end">
+                      <Link className="border w-full" href={`http://localhost:8000/api/v1/download-pdf/${tcc.id}`} download>
+                        <Button className="borde w-full">
+                          Clique aqui para baixar
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

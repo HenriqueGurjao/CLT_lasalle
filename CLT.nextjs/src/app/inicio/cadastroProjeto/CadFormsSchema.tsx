@@ -42,4 +42,16 @@ export const CadProjetoFormSchema = z.object({
     message: "Titulo é obrigatório.",
   }),
   tags: z.array(tagSchema),    
+  pdf_file: z
+    .any()
+    .transform((value) => {
+      if (value instanceof FileList) return value[0];
+      return value;
+    })
+    .refine((file) => file instanceof File, {
+      message: "Arquivo inválido.",
+    })
+    .refine((file) => file?.type === "application/pdf", {
+      message: "O arquivo deve ser um PDF.",
+    }),
 });

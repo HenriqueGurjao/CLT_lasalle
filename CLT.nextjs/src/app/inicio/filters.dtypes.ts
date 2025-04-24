@@ -19,6 +19,9 @@ export interface ProjetoFinal {
   status: string;
   banner_path: string;
   tags: string[];
+  orientador_matr: string;
+  aluno_matr: string;
+  curso_id: string;
 }
 
 // const moreTccs: Tcc[] = [

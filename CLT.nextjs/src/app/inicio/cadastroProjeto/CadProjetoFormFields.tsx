@@ -31,6 +31,7 @@ import { CadProjetoFormSchema, Status } from "./CadFormsSchema";
 import { CadProjetoForm } from "./CadProjetoSchema";
 import { PlusCircle } from "lucide-react";
 import { MinusCircle } from "phosphor-react";
+import { ProjetoFinal } from "../filters.dtypes";
 
 interface Curso {
   id: number;
@@ -39,8 +40,13 @@ interface Curso {
   descricao: string;
 }
 
-export const CadProjetoFormFields = () => {
-  const { form, onSubmit } = CadProjetoForm();
+interface CadProjetoFormFieldsProps {
+  projeto: ProjetoFinal | null;
+  isEdit?: boolean;
+}
+
+export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsProps) => {
+  const { form, onSubmit } = CadProjetoForm(projeto, isEdit);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [periodos, setPeriodos] = useState<number>(1);
@@ -49,6 +55,8 @@ export const CadProjetoFormFields = () => {
   const [tags, setTags] = useState<
     { titulo: string; area_envolvida: string }[]
   >([]);
+
+  console.log(projeto)
 
   const addTag = () => {
     setTags([...tags, { titulo: "", area_envolvida: "" }]);
@@ -301,7 +309,7 @@ export const CadProjetoFormFields = () => {
               type="submit"
               className="w-full bg-cyan-800"
             >
-              Cadastrar
+              {isEdit ? "Salvar alterações" : "Cadastrar projeto"}
             </Button>
           </form>
         </Form>

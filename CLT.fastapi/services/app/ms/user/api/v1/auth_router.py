@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException, Response, Request
+from fastapi.responses import JSONResponse
+import jwt
 from app.ms.user.repositories.usuario_repository import UsuarioRepository
 from app.middleware.auth_middleware import refresh_token
 from app.ms.user.services.auth_service import AuthService
 from app.ms.user.domain.auth import LoginRequest 
-from app.core.security import encrypt_token
+from app.core.security import decrypt_token, encrypt_token, verify_access_token
 from datetime import timedelta
 
 router = APIRouter()
@@ -56,3 +58,21 @@ async def refresh(request: Request):
     if "recuperar_senha" in referer:
         return {"detail": "ok"}
     return refresh_token(request)
+
+@router.get("/auth/verify-role", tags=["Autentificacao"])
+async def verify(request: Request):
+
+    auth_token = request.cookies.get("auth_token")
+
+    try:
+        refresh_token = decrypt_token(auth_token)
+        
+        payload = verify_access_token(refresh_token)  
+
+        if payload is None:
+            return JSONResponse(status_code=401, content={"detail": "Refresh token inválido"})
+
+        role = payload.get("role")
+        return {"role": role}
+    except (jwt.JWTError, IndexError) as e:
+        return JSONResponse(status_code=401, content={"detail": "Token inválido"})

@@ -6,25 +6,48 @@ import { z } from "zod";
 import fetchWithAuth from "@/utils/fetchWithAuth"; 
 import { CadProjetoFormSchema, Status } from "./CadFormsSchema";
 import { toast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { ProjetoFinal } from "../filters.dtypes";
 
 export type FormSchemaType = z.infer<typeof CadProjetoFormSchema>;
 
-export function CadProjetoForm() {
+export function CadProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,) {
+  
   const form = useForm<z.infer<typeof CadProjetoFormSchema>>({
     resolver: zodResolver(CadProjetoFormSchema),
     defaultValues: {
-      aluno_matr: "",
-      curso_id: "",
-      orientador_matr: "",
+      aluno_matr: projeto && isEdit ? projeto.aluno_matr : "",
+      curso_id: projeto && isEdit ? String(projeto.curso_id) : "",
+      orientador_matr: projeto && isEdit ? projeto.orientador_matr : "",
       status:  Status.EM_DESENVOLVIMENTO,
-      titulo: "",
+      titulo: projeto ? projeto.titulo : "",
       pdf_file: undefined,
-      tags: [],
+      tags: projeto && isEdit 
+            ? projeto.tags.map(tag => ({ titulo: tag })) 
+            : [],
     },
   });
 
+   useEffect(() => {
+    if (projeto && isEdit) {
+      form.reset({
+        aluno_matr: projeto.aluno_matr,
+        curso_id: String(projeto.curso_id),
+        orientador_matr: projeto.orientador_matr,
+        status: Status[projeto.status as keyof typeof Status], 
+        titulo: projeto.titulo,
+        pdf_file: undefined,
+        tags: projeto.tags.map(tag => ({
+          titulo: tag,
+          area_envolvida: "",
+        })),
+      });
+    }
+  }, [projeto, isEdit, form]);
+
   async function onSubmit(values: z.infer<typeof CadProjetoFormSchema>) {
 
+    console.log(values, isEdit)
     try {
       const projetoData = {
         aluno_matr: values.aluno_matr,
@@ -32,22 +55,20 @@ export function CadProjetoForm() {
         orientador_matr: values.orientador_matr,
         status: values.status,
         titulo: values.titulo,
-        pdf_file: values.pdf_file, // Isso já é tratado como file
-        tags: values.tags, // Aqui já são enviados como objetos
+        pdf_file: values.pdf_file,
+        tags: values.tags,
       };
       
-      // Convertendo tudo para string JSON
       const formData = new FormData();
-      formData.append("projeto_data", JSON.stringify(projetoData)); // Agora é uma string JSON
+      formData.append("projeto_data", JSON.stringify(projetoData)); 
       
-      formData.append("pdf_file", values.pdf_file); // Lembre-se de que o arquivo já é tratado com File
-      
-      // Enviando a requisição
-      const response = await fetch("http://localhost:8000/api/v1/professor/projeto-final", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+      formData.append("pdf_file", values.pdf_file); 
+
+      // const response = await fetch("http://localhost:8000/api/v1/professor/projeto-final", {
+      //   method: "POST",
+      //   body: formData,
+      //   credentials: "include",
+      // });
   
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
@@ -68,6 +89,7 @@ export function CadProjetoForm() {
       toast({
         title: "Projeto cadastrado com sucesso!",
       });
+      form.reset();
     } catch (error) {
       toast({
         title: "Erro interno no servidor: " + error,

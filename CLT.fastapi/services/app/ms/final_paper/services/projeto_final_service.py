@@ -12,6 +12,7 @@ import traceback
 import shutil
 from datetime import datetime
 from ....utils.pdf.pdf import salvar_capa_pdf
+from ..repositories.project_status import project_status
 
 class ProjetoFinalService:
     def __init__(
@@ -97,8 +98,10 @@ class ProjetoFinalService:
             itens_por_pagina: Optional[int] = None,
             pesquisa: Optional[str] = None,
             periodos: Optional[str] = None,
+            ativos: project_status = project_status.APROVADO
         ):
-        return self.projeto_repository.listar_projetos(cursos_id, status, aluno_id, orientador_id, pagina, itens_por_pagina, pesquisa, periodos)
+
+        return self.projeto_repository.listar_projetos(cursos_id, status, aluno_id, orientador_id, pagina, itens_por_pagina, pesquisa, periodos, ativos)
     
     async def get_user_from_api(self, matr: str, access_token: str):
         url = "http://localhost:8000/api/v1/aluno/"+matr  

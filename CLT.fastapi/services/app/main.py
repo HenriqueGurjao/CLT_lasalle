@@ -1,6 +1,7 @@
 import sys
 import traceback
 from fastapi import FastAPI, Request, Response
+from fastapi.testclient import TestClient
 from app.ms.user.api.v1.usuario_router import router as usuario_router
 from app.ms.user.api.v1.auth_router import router as auth_router
 from app.ms.course.api.v1.course_router import router as course_router
@@ -60,18 +61,25 @@ async def auth_middleware(request: Request, call_next):
                 return JSONResponse(status_code=406, content={"detail": f"Erro ao verificar token: {e}"})
 
         token_encrypted = request.cookies.get("auth_token")
+        refresh_token_cookie = request.cookies.get("refresh_token")
         
         if token_encrypted is None:
             return JSONResponse(status_code=401, content={"detail": "Usuario nao autenticado"})
 
         payload = validate_token(token_encrypted, request)
 
+        if payload is None and refresh_token_cookie:
+            client = TestClient(app)
+            response = client.post("/api/v1/auth/refresh", cookies={"refresh_token": refresh_token_cookie})
+            if response.status_code == 200 and "token" in response.json():
+                novo_token = response.json()["token"]
+                request.cookies["auth_token"] = novo_token
+                payload = validate_token(novo_token, request)
+
         if payload is None:
             return JSONResponse(status_code=401, content={"detail": "Token inválido"})
 
         if isinstance(payload, dict):
-            # if not is_user_active(payload, request) and request.url.path not in ["/api/v1/self/ativar_conta"]:
-            #     return JSONResponse(status_code=303, content={"detail": "Conta nao esta ativa"})
 
             has_permission = check_user_permissions(payload, request)
             if not has_permission:
@@ -89,7 +97,7 @@ async def auth_middleware(request: Request, call_next):
     except Exception as e:
         exc_type, exc_value, exc_tb = sys.exc_info()
         tb = traceback.extract_tb(exc_tb)
-        last_trace = tb[-1]  # Pega a última linha do traceback
+        last_trace = tb[-1]  
 
         print(f"Erro: {e}")
         print(f"Arquivo: {last_trace.filename}")
@@ -105,7 +113,7 @@ async def startup_event():
     usuario_service = UsuarioService(usuario_repository)  
     
     try:
-        admin = usuario_service.get_user_by_matricula('00500500')  # Busca pelo admin
+        admin = usuario_service.get_user_by_matricula('00500500') 
     except:
         admin = None
 

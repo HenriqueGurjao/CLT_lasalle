@@ -55,3 +55,28 @@ export const CadProjetoFormSchema = z.object({
       message: "O arquivo deve ser um PDF.",
     }),
 });
+
+
+export const EditarProjetoFormSchema = z.object({
+  orientador_matr: z.string().min(1, {
+    message: "Matricula não pode estar vazia.",
+  }).max(10, {
+    message: "Matricula deve ter no máximo 10 caracteres.",
+  }).refine((val) => val.startsWith("00700"), {
+    message: "A matrícula deve começar com '00700'.",
+  }),
+  aluno_matr: z.string().min(1,{
+    message: "Matricula não pode estar vazia.",
+  }).max(10, {
+    message: "Matricula deve ter no máximo 10 caracteres.",
+  }).refine((val) => val.startsWith("00500"), {
+    message: "A matrícula deve começar com '00500'.",
+  }),
+  status: z.enum([Status.EM_DESENVOLVIMENTO, Status.PAUSADO, Status.TRANCADO, Status.APROVADO, Status.REPROVADO], {
+    required_error: "Status é obrigatório.",
+  }).default(Status.EM_DESENVOLVIMENTO),
+  titulo: z.string().min(1, {
+    message: "Titulo é obrigatório.",
+  }),
+  tags: z.array(tagSchema),    
+});

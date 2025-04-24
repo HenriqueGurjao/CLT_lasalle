@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CircleNotch } from "phosphor-react";
+import fetchWithAuth from "@/utils/fetchWithAuth";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -50,11 +51,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isFirstVisit = !sessionStorage.getItem("visited");
       const localMatricula = localStorage.getItem("matricula");
       setMatricula(localMatricula ?  localMatricula : "")
+      
+      const getRole = async () => {
+        try{
+          const fetchRole = await fetchWithAuth(`http://localhost:8000/api/v1/auth/verify-role`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }) as Response;
+          const roleResponse = await fetchRole.json();
+          console.log(roleResponse)
+          setRole(roleResponse.role);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
 
       const checkAuth = async () => {
         try {
           if (rotasIgnoradas.some(r => r !== "/" && path.startsWith(r)) || path === "/"){
-            console.log("chamada de need activate return")
             return 
           }
           const response = await fetch("http://localhost:8000/api/v1/auth/refresh", {
@@ -62,17 +79,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             credentials: "include",
           });
 
+          
+          
           if (response.ok) {
             const data = await response.json();
             setIsAuthenticated(true);
-            setRole(data.role);
-
 
             if (path === "/auth") {
               router.push("/inicio");
-            } else {
-              router.push("/inicio"); 
-            }
+            } 
+            // else {
+            //   router.push("/inicio"); 
+            // }
           } else {
             const data = await response.json();
             setIsAuthenticated(false);
@@ -80,7 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
 
         } catch (error) {
-          console.error("Failed to refresh token:", error);
           setIsAuthenticated(false);
           router.push("/auth");
         } finally {
@@ -89,26 +106,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       const needActivateAccount = async () => {
-        console.log("chamada de need activate", path)
         if (rotasIgnoradas.some(r => r !== "/" && path.startsWith(r)) || path === "/"){
-          console.log("chamada de need activate return")
+          console.log("Redirecionando para a página de autenticação");	
           return 
         }
+        getRole();
+
         const userActive = await fetch("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
           method: "GET",
           credentials: "include",
         })
         
-        console.log(userActive)
         const isUserActive = await userActive.json() 
         setIsActive(isUserActive)
-        if(!isUserActive) {
-          router.push("/ativar_conta")
+
+        if (!isUserActive && path !== "/ativar_conta") {
+          router.push("/ativar_conta");
         }
-        else {
-          router.push("/inicio")
+      
+        if (isUserActive && path === "/ativar_conta") {
+          router.push("/inicio");
         }
-        return isActive
+      
+        return isUserActive;
       }
 
       // if(rotasIgnoradas.some(r => path.startsWith(r))){
@@ -151,6 +171,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error("Logout failed:", error);
     }
+    setMatricula("");
+    localStorage.removeItem("matricula");
     setIsAuthenticated(false);
     router.push("/auth");
   };

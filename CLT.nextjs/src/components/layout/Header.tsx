@@ -13,11 +13,11 @@ import Image from "next/image";
 
 export const Header = () => {
   const path = usePathname();
-  const { setUser } = useAuth();
-  const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta",  "/", "/redefinir_senha"];
-
+  const { setUser, matricula, logout, role } = useAuth();
   
+  console.log(matricula)
   useEffect(() => {
+    const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta",  "/", "/redefinir_senha"];
     const fetchData = async () => {
       const matriculaLocalStorage = localStorage.getItem("matricula");
 
@@ -46,7 +46,7 @@ export const Header = () => {
       fetchData();
     }
     
-  }, [path, rotasIgnoradas, setUser]);
+  }, [path, setUser]);
 
   return (
     <header className="w-full border-b  dark:bg-slate-950 h-14 flex items-center border-white bg-gray-200 overflow-hidden pl-6">
@@ -77,10 +77,14 @@ export const Header = () => {
           </li>
         </ul> */}
         <div>
-          {path != "/auth" && path != "/" ? (
+          {path != "/auth" && path != "/" && matricula != "" ? (
             <div className="flex gap-2 items-center">
               <div>
-                <AvatarMenu />
+                {/* <AvatarMenu /> */}
+                {matricula}
+                <Button variant={"link"} className="text-red-500" onClick={() => logout()}>
+                  Sair
+                </Button>
               </div>
             </div>
           ) : (

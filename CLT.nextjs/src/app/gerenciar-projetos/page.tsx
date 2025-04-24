@@ -29,7 +29,6 @@ import Link from "next/link";
 import { FunnelSimple } from "phosphor-react";
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { ProjetoFinal } from "./filters.dtypes";
 import {
   Card,
   CardContent,
@@ -40,10 +39,11 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthProvider";
 import fetchWithAuth from "@/utils/fetchWithAuth";
-import { FilterProps, Filters } from "./Filter";
-import { ListTccs } from "./ListarTccs";
 import { LoggedMenu } from "@/components/layout/LoggedMenu";
-import { ListProjectsFooter } from "./ListProjectsFooter";
+import { FilterProps, Filters } from "../inicio/Filter";
+import { ListProjectsFooter } from "../inicio/ListProjectsFooter";
+import { ListTccs } from "../inicio/ListarTccs";
+import { ProjetoFinal } from "../inicio/filters.dtypes";
 
 const startPeriod = 2000;
 const years = Array.from(
@@ -51,7 +51,7 @@ const years = Array.from(
   (_, i) => i + startPeriod
 );
 
-export default function Home() {
+export default function GerenciarProjetos() {
   const [projetos, setProjetos] = useState<ProjetoFinal[] | null>(null);
   const [pagina, setPagina] = useState<number>(1);
   // const [itensPorPagina, setItensPorPagina] = useState<number>(20);
@@ -76,7 +76,7 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      let endpoint = `http://localhost:8000/api/v1/projetos?pagina=${currentPage}&itens_por_pagina=${itemsPerPages}&ativos=1`;
+      let endpoint = `http://localhost:8000/api/v1/projetos?pagina=${currentPage}&itens_por_pagina=${itemsPerPages}&ativos=0`;
       if (searchText.length > 0) endpoint += `&pesquisa=${searchText}`;
 
       if (selectedPeriods && selectedPeriods.length > 0) {

@@ -49,8 +49,10 @@ export const LoggedMenu = ({
     <>
       {path != "/auth" && path != "/" && (
         <div className="w-ful border p-2 flex justify-between bg-blue-700 rounded-t-md dark:bg-gray-800">
-          <ul className="flex gap-3 items-center">
-            {/* <li>
+          {role == "COORDENADOR" && (
+
+          <ul className="flex gap-3 items-center text-white">
+            <li>
               <Link
                 className="hover:underline"
                 href={"/inicio"}
@@ -58,14 +60,14 @@ export const LoggedMenu = ({
                 Catalogo
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 className="hover:underline"
                 href={"/meus-projetos"}
               >
                 Meus projetos
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 className="hover:underline"
@@ -73,8 +75,9 @@ export const LoggedMenu = ({
               >
                 Gerenciar Projetos
               </Link>
-            </li> */}
+            </li>
           </ul>
+          )}
           <ul className="flex gap-3">
             <li className="flex items-center gap-2">
               <Input
@@ -99,9 +102,11 @@ export const LoggedMenu = ({
             </li>
             <li>
               <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline">Cadastrar</Button>
-                </DialogTrigger>
+                {role == "COORDENADOR" && (
+                  <DialogTrigger asChild>
+                    <Button variant="outline">Cadastrar</Button>
+                  </DialogTrigger>
+                )}
                 <DialogContent className="sm:max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>Cadastrar</DialogTitle>
@@ -142,7 +147,7 @@ export const LoggedMenu = ({
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="projeto">
-                      <CadProjetoFormFields />
+                      <CadProjetoFormFields projeto={null} />
                     </TabsContent>
                     <TabsContent
                       value="professor"

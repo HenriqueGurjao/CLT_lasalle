@@ -78,7 +78,10 @@ class ProjetoFinalRepository:
                 u_orientador.nome as orientador_nome,
                 p.data_apresentacao,
                 REPLACE(p.pdf_path, '.pdf', '_capa.jpg') AS banner_path,
-                STRING_AGG(T.TITULO, ', ') AS tags
+                STRING_AGG(T.TITULO, ', ') AS tags,
+                c.id as curso_id,
+                u_aluno.matricula as aluno_matr,
+                u_orientador.matricula as orientador_matr
             FROM CLT_LASALLE.PROJETO_FINAL P
             LEFT JOIN CLT_LASALLE.TAG_PROJETO TP ON TP.ID_PROJETO = P.ID
             LEFT JOIN CLT_LASALLE.TAG T ON T.ID = TP.ID_TAG
@@ -166,7 +169,7 @@ class ProjetoFinalRepository:
             query_contagem += termo
 
         termo = f"""
-            GROUP BY p.id, p.titulo, p.data_registro, p.status, c.nome, u_aluno.nome, u_orientador.nome, p.data_apresentacao
+            GROUP BY p.id, p.titulo, p.data_registro, p.status, c.nome, u_aluno.nome, u_orientador.nome, p.data_apresentacao, c.id, u_aluno.id, u_orientador.id
             ORDER BY p.DATA_REGISTRO desc
             LIMIT {itens_por_pagina[0]} OFFSET ({pagina[0]} - 1) * {itens_por_pagina[0]};
         """
@@ -204,7 +207,10 @@ class ProjetoFinalRepository:
                     "orientador_nome": projeto[6],
                     "data_apresentacao": projeto[7],
                     "banner_path": self.construir_banner_url(projeto[8]),
-                    "tags": projeto[9].split(", ") if projeto[9] else []
+                    "tags": projeto[9].split(", ") if projeto[9] else [],
+                    "curso_id": projeto[10],
+                    "aluno_matr": projeto[11],
+                    "orientador_matr": projeto[12]
                 }
                 for projeto in projetos
             ],

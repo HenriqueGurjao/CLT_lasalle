@@ -7,6 +7,7 @@ from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, Projeto
 from fastapi import APIRouter, Body, File, Form, HTTPException, Query, Depends, UploadFile
 from ....user.services.usuario_services import UsuarioRepository, UsuarioService
 from ....course.services.course_service import CursoService, CursoRepository
+from ...repositories.project_status import project_status
 from fastapi.openapi.models import Schema
 from fastapi.responses import FileResponse
 import json
@@ -91,8 +92,10 @@ async def listar_projetos_finais(
     itens_por_pagina: Optional[List[int]] = Query(2),
     pesquisa: Optional[str] = Query(None),
     periodos: Optional[str] = Query(None),
+    ativos: Optional[bool] = Query(None),
     projeto_service: ProjetoFinalService = Depends(get_projeto_service)
 ):
+    print(ativos)
     try:
         projetos = projeto_service.listar_projetos_com_filtros(
             cursos_id=cursos_id,
@@ -102,7 +105,8 @@ async def listar_projetos_finais(
             pagina=pagina,
             itens_por_pagina=itens_por_pagina,
             pesquisa=pesquisa,
-            periodos=periodos
+            periodos=periodos,
+            ativos=project_status.APROVADO if ativos else project_status.REPROVADO
         )
         return projetos
     except Exception as e:

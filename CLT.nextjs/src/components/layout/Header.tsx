@@ -15,7 +15,6 @@ export const Header = () => {
   const path = usePathname();
   const { setUser, matricula, logout, role } = useAuth();
   
-  console.log(matricula)
   useEffect(() => {
     const rotasIgnoradas = ["/recuperar_senha", "/auth", "/ativar_conta",  "/", "/redefinir_senha"];
     const fetchData = async () => {

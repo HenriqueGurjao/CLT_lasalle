@@ -120,3 +120,75 @@ class ProjetoFinalService:
         
     def get_pdf_path_by_id(self, projeto_id: int):
         return self.projeto_repository.get_projeto_by_id(projeto_id=projeto_id, colunas=['pdf_path'])
+    
+    def editar_projeto_com_tags(self, projeto_id: int, curso_id: int, orientador_id: int, aluno_id: int, titulo: str, status: str, pdf_path: str = None,pdf_file: UploadFile = File(...), tags: list = None):
+        
+        curso = self.curso_service.buscar_curso_por_id(curso_id)
+        orientador = self.usuario_service.get_user_by(
+            by="p.id",
+            value=orientador_id,
+            columns=['u.matricula'],
+            table="professores p",
+        )
+        aluno = self.usuario_service.get_user_by(
+            by="a.id",
+            value=aluno_id,
+            columns=['u.matricula'],
+            table="alunos a",
+        )
+
+        # now = datetime.now()
+        # semestre = 1 if now.month <= 6 else 2
+        # periodo = f"{now.year}.{semestre}"
+
+        # pdf_path = os.path.normpath(os.path.join(
+        #     "C:/projetos", 
+        #     str(curso['nome']),
+        #     periodo,
+        #     str(orientador[0]),
+        #     str(aluno[0]),
+        #     f"{titulo}_{aluno[0]}.pdf"
+        # ))
+        # os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+
+        # with open(pdf_path, "wb") as buffer:
+        #     shutil.copyfileobj(pdf_file.file, buffer)
+            
+        try:
+            projeto = self.projeto_repository.editar_projeto_final(
+                projeto_id, curso_id, orientador_id, aluno_id, titulo, status
+            )
+
+            # path_capa = salvar_capa_pdf(pdf_path)
+        except Exception as e:
+            # if os.path.exists(pdf_path):
+            #     os.remove(pdf_path)
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            tb = traceback.extract_tb(exc_tb)
+            last_trace = tb[-1]  
+
+            print(f"Erro: {e}")
+            print(f"Arquivo: {last_trace.filename}")
+            print(f"Linha: {last_trace.lineno}")
+            print(f"Função: {last_trace.name}")
+            raise e 
+
+        if tags:
+            for tag in tags:
+                titulo_tag = tag.titulo
+                area_tag = tag.area_envolvida
+                tag_id = self.tag_service.criar_ou_buscar_tag(titulo_tag, area_tag)
+                print(projeto_id,tag_id)
+                self.projeto_repository.associar_tag_projeto(projeto_id, tag_id)
+
+        return projeto
+    
+    def deletar_projeto(self, projeto_id: int):
+        try:
+            # projeto = self.projeto_repository.get_projeto_by_id(projeto_id=projeto_id, colunas=['pdf_path'])
+            # pdf_path = projeto['pdf_path']
+            # if os.path.exists(pdf_path):
+            #     os.remove(pdf_path)
+            self.projeto_repository.deletar_projeto_final(projeto_id)
+        except Exception as e:
+            raise e

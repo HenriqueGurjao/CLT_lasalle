@@ -21,7 +21,6 @@ export function CadCursoForm() {
 
   async function onSubmit(values: z.infer<typeof CadCursoFormSchema>) {
 
-    console.log(JSON.stringify(values))
 
     try {
       const response = await fetch("http://localhost:8000/api/v1/coordenador/curso", {
@@ -35,18 +34,17 @@ export function CadCursoForm() {
 
       if (response && !response.ok) {
         toast({
-          title: "Erro ao cadastrar aluno.",
+          title: "Erro ao cadastrar curso.",
           variant: "destructive",
         })
         return;
       }
 
-      const data = response && await response.json();
+      // const data = response && await response.json();
 
-      console.log(data);
 
       toast({
-        title: "Aluno cadastrado com sucesso!",
+        title: "Curso cadastrado com sucesso!",
       })
     } catch (error) {
       toast({

@@ -28,6 +28,7 @@ import { CadProfessorFormFields } from "./cadastroProfessor/CadProfessorFormFiel
 import { CadAlunoFormFields } from "./cadastroAluno/CadAlunoFormFields";
 import { CadCursoFormFields } from "./cadastrarCurso/CadCursoFormFields";
 import { FilterProps } from "./Filter";
+import { EditProjetoFormFields } from "./cadastroProjeto/EditProjetoFormFields";
 
 interface ListTccsProps {
   itens_por_pagina: number;
@@ -50,8 +51,6 @@ export const ListTccs = ({
   const [isEdit, setEdit] = useState<boolean>(false);
   const [projeto, setProjeto] = useState<ProjetoFinal | null>(null);
   // const [projetos, setProjetos] = useState<ProjetoFinal[] | null>(null);
-
-  console.log(cursos)
 
   const { role } = useAuth();
 
@@ -171,7 +170,16 @@ export const ListTccs = ({
                               </TabsTrigger>
                             </TabsList>
                             <TabsContent value="projeto">
-                              <CadProjetoFormFields isEdit={isEdit} projeto={projeto} />
+                              {
+                                isEdit ? (
+                                  <EditProjetoFormFields
+                                    isEdit={isEdit}
+                                    projeto={projeto}
+                                  />
+                                ) : (
+                                  <CadProjetoFormFields isEdit={isEdit} projeto={projeto} />
+                                )
+                              }
                             </TabsContent>
                           </Tabs>
                         </DialogContent>

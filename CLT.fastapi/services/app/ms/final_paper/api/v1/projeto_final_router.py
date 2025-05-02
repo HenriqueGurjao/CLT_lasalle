@@ -1,9 +1,11 @@
+import sys
+import traceback
 from typing import List, Optional
 from app.ms.final_paper.services.projeto_final_service import ProjetoFinalService
 from app.ms.final_paper.repositories.projeto_final_repository import ProjetoFinalRepository 
 from app.ms.final_paper.repositories.tag_repository import TagRepository 
 from app.ms.final_paper.services.tag_service import TagService
-from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, ProjetoFinalCreateSchema
+from app.ms.final_paper.domain.projeto_final import ProjetoFiltroSchema, ProjetoFinalCreateSchema, ProjetoFinalUpdateSchema
 from fastapi import APIRouter, Body, File, Form, HTTPException, Query, Depends, UploadFile
 from ....user.services.usuario_services import UsuarioRepository, UsuarioService
 from ....course.services.course_service import CursoService, CursoRepository
@@ -125,3 +127,51 @@ async def download_pdf(id: int, projeto_service: ProjetoFinalService = Depends(g
         return FileResponse(pdf_path, media_type='application/pdf', filename=os.path.basename(pdf_path))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao tentar baixar o PDF: {str(e)}")
+
+@router.put("/coordenador/professor/projeto-final/{id}", tags=["Projeto_final"])
+async def atualizar_projeto_final(
+    id: int,
+    projeto_data: ProjetoFinalUpdateSchema = Body(...),
+    projeto_service: ProjetoFinalService = Depends(get_projeto_service),
+    usuario_service: UsuarioService = Depends(get_usuario_service)
+):
+    try:
+        aluno_id = usuario_service.get_student_by_matricula(projeto_data.aluno_matr)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    try:
+        orientador_id = usuario_service.get_teacher_by_matricula(projeto_data.orientador_matr)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    try:
+        projeto_service.editar_projeto_com_tags(
+            projeto_id=id,
+            curso_id=projeto_data.curso_id,
+            orientador_id=orientador_id['id'],
+            aluno_id=aluno_id['aluno_id'],
+            titulo=projeto_data.titulo,
+            status=projeto_data.status,
+            tags=projeto_data.tags
+        )
+        return {"message": "Projeto atualizado com sucesso"}
+    except Exception as e:
+        # exc_type, exc_value, exc_tb = sys.exc_info()
+        # tb = traceback.extract_tb(exc_tb)
+        # last_trace = tb[-1]  # pega a última ocorrência (a mais profunda)
+
+        # print(f"Erro: {e}")
+        # print(f"Arquivo: {last_trace.filename}")
+        # print(f"Linha: {last_trace.lineno}")
+        # print(f"Função: {last_trace.name}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.delete("/coordenador/professor/projeto-final/{id}", tags=["Projeto_final"])
+async def deletar_projeto_final(
+    id: int,
+    projeto_service: ProjetoFinalService = Depends(get_projeto_service)
+):
+    try:
+        projeto_service.deletar_projeto(id)
+        return {"message": "Projeto deletado com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

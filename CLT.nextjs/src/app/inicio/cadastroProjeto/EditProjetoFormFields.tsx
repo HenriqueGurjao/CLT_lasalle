@@ -32,6 +32,7 @@ import { CadProjetoForm } from "./CadProjetoSchema";
 import { PlusCircle } from "lucide-react";
 import { MinusCircle } from "phosphor-react";
 import { ProjetoFinal } from "../filters.dtypes";
+import { EditProjetoForm } from "./EditProjetoSchema";
 
 interface Curso {
   id: number;
@@ -45,8 +46,8 @@ interface CadProjetoFormFieldsProps {
   isEdit?: boolean;
 }
 
-export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsProps) => {
-  const { form, onSubmit } = CadProjetoForm(projeto, isEdit);
+export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsProps) => {
+  const { form, onSubmit } = EditProjetoForm(projeto, isEdit);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [periodos, setPeriodos] = useState<number>(1);
@@ -100,7 +101,6 @@ export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsP
     } else {
       setPeriodos(1);
     }
-    form.setValue("curso_id", value);
   };
 
 
@@ -179,38 +179,6 @@ export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsP
             <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
-                name="curso_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Select
-                        onValueChange={handleCursoChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Curso" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Cursos</SelectLabel>
-                            {cursos.map((curso) => (
-                              <SelectItem
-                                key={curso.id}
-                                value={String(curso.id)}
-                              >
-                                {curso.nome}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
@@ -236,27 +204,6 @@ export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsP
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="pdf_file"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            field.onChange(file); 
-                          }
-                        }}
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -307,7 +254,7 @@ export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsP
               type="submit"
               className="w-full bg-cyan-800"
             >
-              Cadastrar projeto
+              Salvar alterações
             </Button>
           </form>
         </Form>

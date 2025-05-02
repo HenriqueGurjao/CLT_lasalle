@@ -116,11 +116,6 @@ class ProjetoFinalRepository:
         filters = []
         params = []
 
-        # Filtro para status (múltiplos)
-        # if status:
-        #     filters.append(f"p.status IN ({','.join(['%s'] * len(status))})")
-        #     params.extend(status)
-
         if pesquisa:
             termo = f"""
                     (
@@ -136,9 +131,6 @@ class ProjetoFinalRepository:
             """
             query += termo
             query_contagem += termo
-            # params.extend(['%' + pesquisa + '%', '%' + pesquisa + '%', '%' + pesquisa + '%'])
-            # params.extend([pesquisa, pesquisa])
-            # params.extend([pesquisa])
             
         if cursos_id:
             cursos = cursos_id.split('-')
@@ -149,8 +141,6 @@ class ProjetoFinalRepository:
             periodos = periodos.split('-')
             filters.append(f"DATE_PART('year', COALESCE(DATA_APRESENTACAO, DATA_REGISTRO))::int in ({','.join(['%s'] * len(periodos))})")
             params.extend(periodos)
-        # Adiciona os filtros à query
-        
         
         if filters and pesquisa:
             termo = "          AND "+" AND ".join(filters)
@@ -173,7 +163,7 @@ class ProjetoFinalRepository:
             ORDER BY p.DATA_REGISTRO desc
             LIMIT {itens_por_pagina[0]} OFFSET ({pagina[0]} - 1) * {itens_por_pagina[0]};
         """
-        # query_contagem += termo
+
         query += termo
 
         print(query)
@@ -255,3 +245,64 @@ class ProjetoFinalRepository:
         finally:
             conn.close()
 
+    def editar_projeto_final(self, projeto_id, curso_id: int, orientador_id: int, aluno_id: int, titulo: str, status: str, pdf_path: str = None):
+        conn = get_db_connection()
+        print(projeto_id)
+        try:
+            with conn.cursor() as cursor:
+                if pdf_path:
+                    cursor.execute("""
+                        UPDATE CLT_LASALLE.projeto_final
+                        SET 
+                            orientador_id = %s,
+                            aluno_id = %s, 
+                            titulo = %s,
+                            status = %s,
+                            pdf_path = %s,
+                            id = %s
+                        WHERE 
+                    """, (orientador_id, aluno_id, titulo, status, pdf_path, curso_id, projeto_id))
+                else:
+                    cursor.execute("""
+                        UPDATE CLT_LASALLE.projeto_final
+                        SET 
+                            orientador_id = %s,
+                            aluno_id = %s, 
+                            titulo = %s,
+                            status = %s,
+                            curso_id = %s
+                        WHERE id = %s
+                    """, (orientador_id, aluno_id, titulo, status, curso_id, projeto_id))
+
+                # Verifique quantas linhas foram afetadas
+                rows_affected = cursor.rowcount
+
+                if rows_affected == 0:
+                    raise HTTPException(status_code=404, detail="Projeto não encontrado ou não alterado.")
+
+                conn.commit()
+                return {"message": "Projeto atualizado com sucesso"}
+        except Exception as e:
+            print(e)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=f"Erro ao criar projeto final: {e}")
+        finally:
+            conn.close()
+    
+    def deletar_projeto_final(self, projeto_id: int):
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    DELETE FROM CLT_LASALLE.TAG_PROJETO WHERE id_projeto = %s
+                """, (projeto_id,))
+                cursor.execute("""
+                    DELETE FROM CLT_LASALLE.PROJETO_FINAL WHERE id = %s
+                """, (projeto_id,))
+                conn.commit()
+        except Exception as e:
+            print(e)
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=f"Erro ao deletar projeto final: {e}")
+        finally:
+            conn.close()

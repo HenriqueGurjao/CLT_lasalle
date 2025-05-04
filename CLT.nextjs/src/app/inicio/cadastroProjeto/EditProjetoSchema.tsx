@@ -105,6 +105,7 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
         title: "Projeto Editado com sucesso!",
       });
       form.reset();
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Sessao perdida, atualize a pagina: " + error,

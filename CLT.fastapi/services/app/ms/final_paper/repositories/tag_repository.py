@@ -33,3 +33,19 @@ class TagRepository:
             raise HTTPException(status_code=500, detail=f"Erro ao buscar tag: {e}")
         finally:
             conn.close()
+
+    def buscar_tag_associada_projeto(self, projeto_id: int, tag_id: int):
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT * FROM CLT_LASALLE.tag_projeto 
+                    WHERE id_projeto = %s AND id_tag = %s
+                """, (projeto_id, tag_id))
+                projeto_tag = cursor.fetchone()
+                print("projeto_tag: ",projeto_tag)
+                return True if projeto_tag else False
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Erro ao buscar tag associada ao projeto: {e}")
+        finally:
+            conn.close()

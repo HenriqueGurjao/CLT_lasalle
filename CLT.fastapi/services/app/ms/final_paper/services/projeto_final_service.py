@@ -173,13 +173,17 @@ class ProjetoFinalService:
             print(f"Função: {last_trace.name}")
             raise e 
 
-        if tags:
-            for tag in tags:
-                titulo_tag = tag.titulo
-                area_tag = tag.area_envolvida
-                tag_id = self.tag_service.criar_ou_buscar_tag(titulo_tag, area_tag)
-                print(projeto_id,tag_id)
-                self.projeto_repository.associar_tag_projeto(projeto_id, tag_id)
+        # if tags:
+        #     print("tags: ", tags)
+        #     for tag in tags:
+        #         titulo_tag = tag.titulo
+        #         area_tag = tag.area_envolvida
+        #         tag_id = self.tag_service.criar_ou_buscar_tag(titulo_tag, area_tag)
+        #         tag_associada = self.tag_service.buscar_associacao_tag_projeto(projeto_id, tag_id)
+        #         print("tag_associada: ", tag_associada)
+        #         if not tag_associada:
+        #             print("Tag não encontrada no projeto, associando nova tag.", tag_id)
+        #             self.projeto_repository.associar_tag_projeto(projeto_id, tag_id)
 
         return projeto
     

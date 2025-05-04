@@ -114,7 +114,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
     <Card>
       <CardHeader>
         <CardTitle>Projeto</CardTitle>
-        <CardDescription>Cadastrar um novo Projeto</CardDescription>
+        <CardDescription>Editando {projeto?.titulo}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 max-h-[70%] sm:max-h-[80%] overflow-y-auto">
         <Form {...form}>
@@ -148,7 +148,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="relative">
+                    <div className="relative hidden">
                       <Input
                         placeholder="Titulo"
                         className="mt-1"
@@ -236,7 +236,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
                 )}
               />
             </div>
-            <div className="space-y-2 max-h-56 overflow-y-auto">
+            {/* <div className="space-y-2 max-h-56 overflow-y-auto">
               <div className="flex items-center gap-2">
                 <Label>Tags</Label>
                 <Button
@@ -260,7 +260,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
                   />
                   <Input
                     placeholder="Área Envolvida"
-                    value={tag.area_envolvida}
+                    value={"busca"}
                     className="hidden"
                     onChange={(e) =>
                       updateTag(index, "area_envolvida", e.target.value)
@@ -278,7 +278,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
                   )}
                 </div>
               ))}
-            </div>
+            </div> */}
             <Button
               type="submit"
               className="w-full bg-cyan-800"

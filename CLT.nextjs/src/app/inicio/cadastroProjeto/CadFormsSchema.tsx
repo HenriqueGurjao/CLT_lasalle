@@ -35,9 +35,19 @@ export const CadProjetoFormSchema = z.object({
   }).refine((val) => val.startsWith("00500"), {
     message: "A matrícula deve começar com '00500'.",
   }),
-  status: z.enum([Status.EM_DESENVOLVIMENTO, Status.PAUSADO, Status.TRANCADO, Status.APROVADO, Status.REPROVADO], {
+  // status: z.enum([Status.EM_DESENVOLVIMENTO, Status.PAUSADO, Status.TRANCADO, Status.APROVADO, Status.REPROVADO], {
+  //   required_error: "Status é obrigatório.",
+  // }).default(Status.EM_DESENVOLVIMENTO),
+  status: z
+  .string({
     required_error: "Status é obrigatório.",
-  }).default(Status.EM_DESENVOLVIMENTO),
+    invalid_type_error: "Status deve ser uma string.",
+  })
+  .refine((val) => Object.values(Status).includes(val as Status), {
+    message:
+      "Status inválido. Escolha entre: EM DESENVOLVIMENTO, PAUSADO, TRANCADO, APROVADO ou REPROVADO.",
+  })
+  .default(Status.EM_DESENVOLVIMENTO),
   titulo: z.string().min(1, {
     message: "Titulo é obrigatório.",
   }),
@@ -58,6 +68,7 @@ export const CadProjetoFormSchema = z.object({
 
 
 export const EditarProjetoFormSchema = z.object({
+  project_id: z.number().optional(),
   orientador_matr: z.string().min(1, {
     message: "Matricula não pode estar vazia.",
   }).max(10, {
@@ -72,9 +83,16 @@ export const EditarProjetoFormSchema = z.object({
   }).refine((val) => val.startsWith("00500"), {
     message: "A matrícula deve começar com '00500'.",
   }),
-  status: z.enum([Status.EM_DESENVOLVIMENTO, Status.PAUSADO, Status.TRANCADO, Status.APROVADO, Status.REPROVADO], {
+  status: z
+  .string({
     required_error: "Status é obrigatório.",
-  }).default(Status.EM_DESENVOLVIMENTO),
+    invalid_type_error: "Status deve ser uma string.",
+  })
+  .refine((val) => Object.values(Status).includes(val as Status), {
+    message:
+      "Status inválido. Escolha entre: EM DESENVOLVIMENTO, PAUSADO, TRANCADO, APROVADO ou REPROVADO.",
+  })
+  .default(Status.EM_DESENVOLVIMENTO),
   titulo: z.string().min(1, {
     message: "Titulo é obrigatório.",
   }),

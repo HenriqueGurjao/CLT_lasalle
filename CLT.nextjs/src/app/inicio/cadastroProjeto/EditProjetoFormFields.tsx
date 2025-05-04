@@ -89,6 +89,12 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
       }
     }
 
+    setTags(
+      projeto?.tags.map((tag) => ({
+        titulo: tag,
+        area_envolvida: "",
+      })) || []
+    )
     fetchCursos();
   }, []);
 
@@ -116,6 +122,26 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4"
           >
+            <FormField
+              control={form.control}
+              name="project_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="relative hidden">
+                      <Input
+                        placeholder="id"
+                        className="mt-1"
+                        {...field}
+                        type="text"
+                        name="project_id"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="titulo"
@@ -185,7 +211,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        value={field.value}
+                        value={projeto?.status || field.value || ""}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Status" />
@@ -235,18 +261,21 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
                   <Input
                     placeholder="Área Envolvida"
                     value={tag.area_envolvida}
+                    className="hidden"
                     onChange={(e) =>
                       updateTag(index, "area_envolvida", e.target.value)
                     }
                   />
-                  <Button
-                    type="button"
-                    onClick={() => removeTag(index)}
-                    variant={"outline"}
-                    className="rounded-full p-0 px-2"
-                  >
-                    <MinusCircle size={24} />
-                  </Button>
+                  {tag.titulo == "" && (
+                    <Button
+                      type="button"
+                      onClick={() => removeTag(index)}
+                      variant={"outline"}
+                      className="rounded-full p-0 px-2"
+                    >
+                      <MinusCircle size={24} />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

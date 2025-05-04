@@ -135,6 +135,8 @@ async def atualizar_projeto_final(
     projeto_service: ProjetoFinalService = Depends(get_projeto_service),
     usuario_service: UsuarioService = Depends(get_usuario_service)
 ):
+    print(projeto_data)
+    print(id)
     try:
         aluno_id = usuario_service.get_student_by_matricula(projeto_data.aluno_matr)
     except Exception as e:
@@ -163,6 +165,7 @@ async def atualizar_projeto_final(
         # print(f"Arquivo: {last_trace.filename}")
         # print(f"Linha: {last_trace.lineno}")
         # print(f"Função: {last_trace.name}")
+        print(f"Erro ao atualizar projeto: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.delete("/coordenador/professor/projeto-final/{id}", tags=["Projeto_final"])

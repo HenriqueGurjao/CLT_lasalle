@@ -114,7 +114,7 @@ export const CadCursoFormFields = () => {
                         placeholder="Duracao do curso em periodos"
                         className=""
                         {...field}
-                        type="number"
+                        type="text"
                         name="periodo"
                       />
                     </div>

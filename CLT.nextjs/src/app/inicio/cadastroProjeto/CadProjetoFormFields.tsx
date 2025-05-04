@@ -287,7 +287,8 @@ export const CadProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFieldsP
                   />
                   <Input
                     placeholder="Área Envolvida"
-                    value={tag.area_envolvida}
+                    value={"busca"}
+                    className="hidden"
                     onChange={(e) =>
                       updateTag(index, "area_envolvida", e.target.value)
                     }

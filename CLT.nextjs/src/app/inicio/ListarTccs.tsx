@@ -14,7 +14,7 @@ import { CircleNotch } from "phosphor-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Pencil } from "lucide-react";
+import { Download, Pencil, Trash } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -130,60 +130,124 @@ export const ListTccs = ({
                       download
                     >
                       <Button className="borde w-full">
-                        Clique aqui para baixar
+                        <Download />
                       </Button>
                     </Link>
                     {role == "COORDENADOR" && (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant={"ghost"}
-                            className="rounded-full cursor-pointer"
-                            onClick={() => 
-                              (setEdit(true), setProjeto(tcc))
-                            }
-                          >
-                            <Pencil />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-3xl">
-                          <DialogHeader>
-                            <DialogTitle>Editar</DialogTitle>
-                          </DialogHeader>
-                          <Tabs
-                            defaultValue="projeto"
-                            className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
-                          >
-                            <TabsList
-                              className={`"flex w-full ${
-                                role === "COORDENADOR"
-                                  ? "grid-cols-5"
-                                  : "grid-cols-1"
-                              }"`}
+                      <>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant={"ghost"}
+                              className="rounded-full cursor-pointer"
+                              onClick={() => (setEdit(true), setProjeto(tcc))}
                             >
-                              {role === "COORDENADOR" && <></>}
-                              <TabsTrigger
-                                className="w-full"
-                                value="projeto"
+                              <Pencil />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                              <DialogTitle>Editar</DialogTitle>
+                            </DialogHeader>
+                            <Tabs
+                              defaultValue="projeto"
+                              className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
+                            >
+                              <TabsList
+                                className={`"flex w-full ${
+                                  role === "COORDENADOR"
+                                    ? "grid-cols-5"
+                                    : "grid-cols-1"
+                                }"`}
                               >
-                                Projeto
-                              </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="projeto">
-                              {
-                                isEdit ? (
+                                {role === "COORDENADOR" && <></>}
+                                <TabsTrigger
+                                  className="w-full"
+                                  value="projeto"
+                                >
+                                  Projeto
+                                </TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="projeto">
+                                {isEdit ? (
                                   <EditProjetoFormFields
                                     isEdit={isEdit}
                                     projeto={projeto}
                                   />
                                 ) : (
-                                  <CadProjetoFormFields isEdit={isEdit} projeto={projeto} />
-                                )
-                              }
-                            </TabsContent>
-                          </Tabs>
-                        </DialogContent>
-                      </Dialog>
+                                  <CadProjetoFormFields
+                                    isEdit={isEdit}
+                                    projeto={projeto}
+                                  />
+                                )}
+                              </TabsContent>
+                            </Tabs>
+                          </DialogContent>
+                        </Dialog>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant={"ghost"}
+                              className="rounded-full cursor-pointer"
+                              onClick={() => (setEdit(true), setProjeto(tcc))}
+                            >
+                              <Trash />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                              <DialogTitle>{tcc.titulo}</DialogTitle>
+                            </DialogHeader>
+                            <Tabs
+                              defaultValue="projeto"
+                              className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
+                            >
+                              <TabsList
+                                className={`"flex w-full ${
+                                  role === "COORDENADOR"
+                                    ? "grid-cols-5"
+                                    : "grid-cols-1"
+                                }"`}
+                              >
+                                {role === "COORDENADOR" && <></>}
+                                <TabsTrigger
+                                  className="w-full"
+                                  value="projeto"
+                                >
+                                  Tem certeza que deseja excluir?
+                                </TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="projeto" className="flex justify-center gap-3">
+                                <Button
+                                  variant={"default"}
+                                  onClick={async () => {
+                                    const response = await fetchWithAuth(
+                                      `http://localhost:8000/api/v1/coordenador/professor/projeto-final/${tcc.id}`,
+                                      {
+                                        method: "DELETE",
+                                        credentials: "include",
+                                      }
+                                    );
+                                    if (response && response.ok) {
+                                      window.location.reload();
+                                    } else {
+                                      console.error("Erro ao excluir o projeto");
+                                    }
+                                  }}
+                                >
+                                  Sim
+                                </Button>
+                                <Button
+                                  variant={"destructive"}
+                                  onClick={() => (setEdit(false), setProjeto(null))}
+                                >
+                                  Não
+                                </Button>
+                              </TabsContent>
+                            </Tabs>
+                          </DialogContent>
+                        </Dialog>
+                      </>
                     )}
                   </div>
                 </div>

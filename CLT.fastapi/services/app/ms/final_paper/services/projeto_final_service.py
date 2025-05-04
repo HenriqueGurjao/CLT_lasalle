@@ -123,7 +123,7 @@ class ProjetoFinalService:
     
     def editar_projeto_com_tags(self, projeto_id: int, curso_id: int, orientador_id: int, aluno_id: int, titulo: str, status: str, pdf_path: str = None,pdf_file: UploadFile = File(...), tags: list = None):
         
-        curso = self.curso_service.buscar_curso_por_id(curso_id)
+        # curso = self.curso_service.buscar_curso_por_id(curso_id)
         orientador = self.usuario_service.get_user_by(
             by="p.id",
             value=orientador_id,

@@ -91,6 +91,7 @@ export function CadProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,) 
         title: "Projeto cadastrado com sucesso!",
       });
       form.reset();
+      window.location.reload();
     } catch (error) {
       // toast({
       //   title: "Erro interno no servidor: " + error,

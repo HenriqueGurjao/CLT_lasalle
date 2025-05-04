@@ -166,7 +166,7 @@ class ProjetoFinalRepository:
 
         query += termo
 
-        print(query)
+        # print(query)
         try:
             with conn.cursor() as cursor:
                 cursor.execute(query, tuple(params))

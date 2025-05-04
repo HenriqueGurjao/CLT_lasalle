@@ -32,11 +32,13 @@ export function CadCursoForm() {
         credentials: "include", 
       });
 
-      if (response && !response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json();
         toast({
           title: "Erro ao cadastrar curso.",
+          description: JSON.stringify(errorData.detail[0].msg || errorData),
           variant: "destructive",
-        })
+        });
         return;
       }
 

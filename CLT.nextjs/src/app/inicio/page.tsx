@@ -98,6 +98,8 @@ export default function Home() {
 
       setProjetos(data.projetos);
       setPagesNumber(data.total_pages)
+      console.log(data.total_pages)
+      console.log(data.projetos.length)
     } catch (error) {
       console.error("Error fetching tccs:", error);
     }

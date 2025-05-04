@@ -95,7 +95,7 @@ class ProjetoFinalRepository:
 
         query_contagem = f"""
             SELECT
-                (COUNT(*) / {itens_por_pagina[0]}) AS total_paginas
+                CEIL(COUNT(DISTINCT p.id)::decimal / {itens_por_pagina[0]}) AS total_paginas
             FROM CLT_LASALLE.PROJETO_FINAL P
             LEFT JOIN CLT_LASALLE.TAG_PROJETO TP ON TP.ID_PROJETO = P.ID
             LEFT JOIN CLT_LASALLE.TAG T ON T.ID = TP.ID_TAG
@@ -166,7 +166,6 @@ class ProjetoFinalRepository:
 
         query += termo
 
-        # print(query)
         try:
             with conn.cursor() as cursor:
                 cursor.execute(query, tuple(params))
@@ -185,6 +184,7 @@ class ProjetoFinalRepository:
             conn.close()
 
         total_pages = total[0][0] if total else 0
+        print(query_contagem, total_pages)
         return {
             "projetos": [
                 {

@@ -21,7 +21,7 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
       project_id: projeto ? projeto.id : undefined,
       aluno_matr: projeto && isEdit ? projeto.aluno_matr : "",
       orientador_matr: projeto && isEdit ? projeto.orientador_matr : "",
-      status:  Status.EM_DESENVOLVIMENTO,
+      status:  projeto?.status ? projeto.status : Status.EM_DESENVOLVIMENTO,
       titulo: projeto ? projeto.titulo : "",
       tags: projeto && isEdit 
             ? projeto.tags.map(tag => ({ titulo: tag })) 
@@ -76,7 +76,7 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
       const formData = new FormData();
       formData.append("projeto_data", JSON.stringify(projetoData)); 
      
-      const response = await fetch("http://localhost:8000/api/v1/coordenador/professor/projeto-final/"+ values.project_id, {
+      const response = await fetchWithAuth("http://localhost:8000/api/v1/coordenador/professor/projeto-final/"+ values.project_id, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
         credentials: "include",
       });
   
-      if (!response.ok) {
+      if (response && !response.ok) {
         const errorData = await response.json().catch(() => null);
         // const errorMessage = errorData?.detail || `Erro ao cadastrar (código ${response.status}).`;
         // console.log("errorData", errorData.detail[0])

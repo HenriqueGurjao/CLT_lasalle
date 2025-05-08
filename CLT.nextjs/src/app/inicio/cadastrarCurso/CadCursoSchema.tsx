@@ -23,7 +23,7 @@ export function CadCursoForm() {
 
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/coordenador/curso", {
+      const response = await fetchWithAuth("http://localhost:8000/api/v1/coordenador/curso", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export function CadCursoForm() {
         credentials: "include", 
       });
 
-      if (!response.ok) {
+      if (response && !response.ok) {
         const errorData = await response.json();
         toast({
           title: "Erro ao cadastrar curso.",

@@ -30,7 +30,7 @@ export function CadProfessorForm() {
     console.log(JSON.stringify(values))
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/coordenador/professores/", {
+      const response = await fetchWithAuth("http://localhost:8000/api/v1/coordenador/professores/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,11 +40,22 @@ export function CadProfessorForm() {
       });
 
       if (response && !response.ok) {
+        const errorData = await response.json().catch(() => null);
+
+        const errorMessage =
+          Array.isArray(errorData?.detail) && errorData.detail[0]?.msg
+            ? errorData.detail[0].msg
+            : errorData?.detail || `Erro ao cadastrar (código ${response.status}).`;
+        
+        console.log(errorMessage);
+
         toast({
-          title: "Erro ao cadastrar aluno.",
+          title: "Erro!",
+          description: errorMessage.split(":")[1],
           variant: "destructive",
-        })
-        return;
+        });
+
+        return; 
       }
 
       const data = response && await response.json();
@@ -52,7 +63,7 @@ export function CadProfessorForm() {
       console.log(data);
 
       toast({
-        title: "Aluno cadastrado com sucesso!",
+        title: "Professor cadastrado com sucesso!",
       })
     } catch (error) {
       toast({

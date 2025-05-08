@@ -6,6 +6,7 @@ from app.core.security import hash_password
 from fastapi import HTTPException, Request
 from starlette.responses import RedirectResponse
 from .allowed_columns import ALUNO_ALLOWED_COLUMNS, PROFESSOR_ALLOWED_COLUMNS
+from psycopg2 import errors
 
 class UsuarioRepository:
     def __init__(self):
@@ -19,7 +20,7 @@ class UsuarioRepository:
                 count = cursor.fetchone()[0]
             return count > 0
         except Exception as e:
-            raise Exception (f"Erro ao verificar usuário: {e}")
+            raise Exception (f"{e}")
         finally:
             conn.close()
 
@@ -53,12 +54,24 @@ class UsuarioRepository:
                 usuario_id = cursor.fetchone()[0]
                 conn.commit() 
             return usuario_id
+        except errors.UniqueViolation:
+            conn.rollback()
+            raise HTTPException(status_code=400, detail="Matrícula já está em uso.")
+
+        except errors.NotNullViolation as e:
+            conn.rollback()
+            raise HTTPException(status_code=400, detail=f"Campo obrigatório ausente: {e.diag.column_name}")
+
+        except errors.ForeignKeyViolation:
+            conn.rollback()
+            raise HTTPException(status_code=400, detail="Referência de chave estrangeira inválida.")
+
         except Exception as e:
-            print(e)
-            conn.rollback()  
-            raise Exception(f"Erro ao criar usuário: {str(e)}")
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=f"Erro inesperado ao criar usuário: {str(e)}")
+
         finally:
-            conn.close  
+            conn.close()
 
     def criar_aluno(self, aluno: Aluno):
         # if self.usuario_existe(aluno.email):
@@ -82,11 +95,24 @@ class UsuarioRepository:
                         VALUES (%s, %s, %s)
                     """, (usuario_id, aluno.periodo, aluno.status.value))
                     conn.commit()
+            except errors.UniqueViolation:
+                conn.rollback()
+                raise HTTPException(status_code=400, detail="Matrícula já está em uso.")
+
+            except errors.NotNullViolation as e:
+                conn.rollback()
+                raise HTTPException(status_code=400, detail=f"Campo obrigatório ausente: {e.diag.column_name}")
+
+            except errors.ForeignKeyViolation:
+                conn.rollback()
+                raise HTTPException(status_code=400, detail="Referência de chave estrangeira inválida.")
+
             except Exception as e:
-                conn.rollback()  
-                raise Exception(f"Erro ao criar aluno: {str(e)}")
+                conn.rollback()
+                raise HTTPException(status_code=500, detail=f"Erro inesperado ao criar usuário: {str(e)}")
+
             finally:
-                conn.close 
+                conn.close()
 
     def obter_usuario_id(self, email: str) -> int:
         conn = get_db_connection()
@@ -172,7 +198,7 @@ class UsuarioRepository:
                 }
                 return professor_dict
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Erro ao obter professor: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"{str(e)}")
         finally:
             conn.close
 
@@ -197,11 +223,24 @@ class UsuarioRepository:
                             VALUES (%s, %s, %s, %s)
                         """, (usuario_id, professor.departamento, professor.titulacao, professor.funcao))
                         conn.commit()
+                except errors.UniqueViolation:
+                    conn.rollback()
+                    raise HTTPException(status_code=400, detail="Matrícula já está em uso.")
+
+                except errors.NotNullViolation as e:
+                    conn.rollback()
+                    raise HTTPException(status_code=400, detail=f"Campo obrigatório ausente: {e.diag.column_name}")
+
+                except errors.ForeignKeyViolation:
+                    conn.rollback()
+                    raise HTTPException(status_code=400, detail="Referência de chave estrangeira inválida.")
+
                 except Exception as e:
-                    conn.rollback() 
-                    raise Exception(f"Erro ao criar professor: {str(e)}")
+                    conn.rollback()
+                    raise HTTPException(status_code=500, detail=f"Erro inesperado ao criar usuário: {str(e)}")
+
                 finally:
-                    conn.close
+                    conn.close()
             else:       
                 raise Exception('O email do professor deve começar com "prof.".') 
 

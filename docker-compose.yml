@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./CLT.fastapi
+    container_name: python-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./CLT.fastapi:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./CLT.nextjs
+    container_name: node-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./CLT.nextjs:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://10.0.0.102:8000
+      - NEXT_PUBLIC_SECRET_KEY=sua-chave-secreta
+    # depends_on:
+    #   - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

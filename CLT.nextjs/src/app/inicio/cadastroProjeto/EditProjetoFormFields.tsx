@@ -211,7 +211,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        value={projeto?.status || field.value || ""}
+                        value={field.value}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Status" />

@@ -65,13 +65,13 @@ export function CadProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,) 
       
       formData.append("pdf_file", values.pdf_file); 
 
-      const response = await fetch("http://localhost:8000/api/v1/professor/projeto-final", {
+      const response = await fetchWithAuth("http://localhost:8000/api/v1/professor/projeto-final", {
         method: "POST",
         body: formData,
         credentials: "include",
       });
   
-      if (!response.ok) {
+      if (response && response.ok) {
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.detail || `Erro ao cadastrar (código ${response.status}).`;
   

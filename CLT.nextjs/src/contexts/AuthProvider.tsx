@@ -112,12 +112,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         getRole();
 
-        const userActive = await fetch("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
+        const userActive = await fetchWithAuth("http://localhost:8000/api/v1/conta_ativa?matricula="+localMatricula, {
           method: "GET",
           credentials: "include",
         })
         
-        const isUserActive = await userActive.json() 
+        const isUserActive = await userActive?.json() 
         setIsActive(isUserActive)
 
         if (!isUserActive && path !== "/ativar_conta") {

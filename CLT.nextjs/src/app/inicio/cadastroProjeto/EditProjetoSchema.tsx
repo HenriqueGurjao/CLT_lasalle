@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import fetchWithAuth from "@/utils/fetchWithAuth"; 
-import { CadProjetoFormSchema, EditarProjetoFormSchema, Status } from "./CadFormsSchema";
+import { CadProjetoFormSchema, EditarProjetoFormSchema, StatusEdit } from "./CadFormsSchema";
 import { toast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { ProjetoFinal } from "../filters.dtypes";
@@ -13,7 +13,6 @@ export type FormSchemaType = z.infer<typeof CadProjetoFormSchema>;
 
 export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,) {
 
-  console.log("isEdit", isEdit);
   
   const form = useForm<z.infer<typeof EditarProjetoFormSchema>>({
     resolver: zodResolver(EditarProjetoFormSchema),
@@ -21,7 +20,7 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
       project_id: projeto ? projeto.id : undefined,
       aluno_matr: projeto && isEdit ? projeto.aluno_matr : "",
       orientador_matr: projeto && isEdit ? projeto.orientador_matr : "",
-      status:  projeto?.status ? projeto.status : Status.EM_DESENVOLVIMENTO,
+      status:  projeto?.status ? projeto.status : StatusEdit.EM_DESENVOLVIMENTO,
       titulo: projeto ? projeto.titulo : "",
       tags: projeto && isEdit 
             ? projeto.tags.map(tag => ({ titulo: tag })) 
@@ -35,7 +34,7 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
       form.reset({
         aluno_matr: projeto.aluno_matr,
         orientador_matr: projeto.orientador_matr,
-        status: Status[projeto.status as keyof typeof Status], 
+        status: StatusEdit[projeto.status as keyof typeof StatusEdit], 
         titulo: projeto.titulo,
         tags: projeto.tags.map(tag => ({
           titulo: tag,
@@ -45,17 +44,17 @@ export function EditProjetoForm(projeto: ProjetoFinal | null, isEdit?: boolean,)
     }
   }, [projeto, isEdit, form]);
 
-  function isValidStatus(value: any): value is Status {
-    const isValid = Object.values(Status).includes(value)
+  function isValidStatus(value: any): value is StatusEdit {
+    const isValid = Object.values(StatusEdit).includes(value)
     console.log(isValid)
     return isValid;
   }
   
-  function parseStatus(input: string): Status | undefined {
-    return Object.values(Status).find(status => status === input);
+  function parseStatus(input: string): StatusEdit | undefined {
+    return Object.values(StatusEdit).find(status => status === input);
   }
 
-  type StatusKey = keyof typeof Status;
+  type StatusKey = keyof typeof StatusEdit;
 // StatusKey = "EM_DESENVOLVIMENTO" | "PAUSADO" | "TRANCADO" | "APROVADO" | "REPROVADO"
 
   async function onSubmit(values: z.infer<typeof EditarProjetoFormSchema>) {

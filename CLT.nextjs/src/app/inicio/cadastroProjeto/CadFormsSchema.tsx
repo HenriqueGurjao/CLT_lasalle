@@ -5,7 +5,15 @@ import { z } from "zod"
 
 export enum Status {
   EM_DESENVOLVIMENTO = "EM DESENVOLVIMENTO",
-  PAUSADO = "PAUSADO",
+  // PAUSADO = "PAUSADO",
+  // TRANCADO = "TRANCADO",
+  APROVADO = "APROVADO",
+  // REPROVADO = "REPROVADO",
+}
+
+export enum StatusEdit {
+  EM_DESENVOLVIMENTO = "EM DESENVOLVIMENTO",
+  // PAUSADO = "PAUSADO",
   TRANCADO = "TRANCADO",
   APROVADO = "APROVADO",
   REPROVADO = "REPROVADO",
@@ -88,9 +96,9 @@ export const EditarProjetoFormSchema = z.object({
     required_error: "Status é obrigatório.",
     invalid_type_error: "Status deve ser uma string.",
   })
-  .refine((val) => Object.values(Status).includes(val as Status), {
+  .refine((val) => Object.values(StatusEdit).includes(val as StatusEdit), {
     message:
-      "Status inválido. Escolha entre: EM DESENVOLVIMENTO, PAUSADO, TRANCADO, APROVADO ou REPROVADO.",
+      "Status inválido. Escolha entre: EM DESENVOLVIMENTO, TRANCADO, APROVADO ou REPROVADO.",
   })
   .default(Status.EM_DESENVOLVIMENTO),
   titulo: z.string().min(1, {

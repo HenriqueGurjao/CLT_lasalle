@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import fetchWithAuth from "@/utils/fetchWithAuth";
-import { CadProjetoFormSchema, Status } from "./CadFormsSchema";
+import { CadProjetoFormSchema, StatusEdit } from "./CadFormsSchema";
 import { CadProjetoForm } from "./CadProjetoSchema";
 import { PlusCircle } from "lucide-react";
 import { MinusCircle } from "phosphor-react";
@@ -52,7 +52,7 @@ export const EditProjetoFormFields = ({ isEdit, projeto } : CadProjetoFormFields
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [periodos, setPeriodos] = useState<number>(1);
   const [cursoSelecionado, setCursoSelecionado] = useState<number | null>(null);
-  const statusPermitidos = Object.values(Status);
+  const statusPermitidos = Object.values(StatusEdit);
   const [tags, setTags] = useState<
     { titulo: string; area_envolvida: string }[]
   >([]);

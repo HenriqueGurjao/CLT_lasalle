@@ -62,7 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
           }) as Response;
           const roleResponse = await fetchRole.json();
-          console.log(roleResponse)
           setRole(roleResponse.role);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -71,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const checkAuth = async () => {
         try {
-          if (rotasIgnoradas.some(r => r !== "/" && path.startsWith(r)) || path === "/"){
+          if (rotasIgnoradas.some(r => path.startsWith(r)) || path === "/"){
             return 
           }
           const response = await fetch("http://localhost:8000/api/v1/auth/refresh", {
@@ -107,7 +106,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const needActivateAccount = async () => {
         if (rotasIgnoradas.some(r => r !== "/" && path.startsWith(r)) || path === "/"){
-          console.log("Redirecionando para a página de autenticação");	
           return 
         }
         getRole();

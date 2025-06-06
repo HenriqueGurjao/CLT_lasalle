@@ -68,7 +68,7 @@ export function useActivateAccount() {
 
       router.push("/inicio");
     } catch (error) {
-      alert("Erro interno no servidor: " + error);
+      // alert("Erro interno no servidor: " + error);
     }
   }
 

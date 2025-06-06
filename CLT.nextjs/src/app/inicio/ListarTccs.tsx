@@ -29,6 +29,7 @@ import { CadAlunoFormFields } from "./cadastroAluno/CadAlunoFormFields";
 import { CadCursoFormFields } from "./cadastrarCurso/CadCursoFormFields";
 import { FilterProps } from "./Filter";
 import { EditProjetoFormFields } from "./cadastroProjeto/EditProjetoFormFields";
+import { usePathname } from "next/navigation";
 
 interface ListTccsProps {
   itens_por_pagina: number;
@@ -53,6 +54,12 @@ export const ListTccs = ({
   // const [projetos, setProjetos] = useState<ProjetoFinal[] | null>(null);
 
   const { role } = useAuth();
+
+  const path = usePathname();
+
+  useEffect(() => {
+    console.log("Pathname:", path);
+  }, [path]);
 
   const handleFlip = (index: number) => {
     setFlipped(flipped === index ? null : index);
@@ -133,7 +140,7 @@ export const ListTccs = ({
                         <Download />
                       </Button>
                     </Link>
-                    {role == "COORDENADOR" && (
+                    {role == "COORDENADOR" && ["/inicio", "/gerenciar_projetos"].includes(path) && (
                       <>
                         <Dialog>
                           <DialogTrigger asChild>

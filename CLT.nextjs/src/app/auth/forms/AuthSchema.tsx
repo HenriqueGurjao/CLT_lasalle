@@ -59,7 +59,7 @@ export function AuthForm() {
         router.push("/inicio");
       }
     } catch (error) {
-      alert("Erro interno no servidor: " + error);
+      // alert("Erro interno no servidor: " + error);
     }
   }
 

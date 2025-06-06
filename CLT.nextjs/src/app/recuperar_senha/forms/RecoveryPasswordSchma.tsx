@@ -74,7 +74,7 @@ export function useRecoveryPassword() {
       // }, 4000)
       setFormLoading(false);
     } catch (error) {
-      alert("Erro interno no servidor: " + error);
+      // alert("Erro interno no servidor: " + error);
     }
   }
 

@@ -7,8 +7,7 @@ export enum Status {
   COORDENADOR = "COORDENADOR",
   COORDENADOR_ADJUNTO = "COORDENADOR ADJUNTO",
   PROFESSOR_ADJUNTO = "PROFESSOR ADJUNTO",
-  PROFESSOR_SUBSTITUTO = "PROFESSOR SUBSTITUTO",
-  SUSPENSO = "SUSPENSO",
+  PROFESSOR_SUBSTITUTO = "PROFESSOR SUBSTITUTO"
 }
 
 export enum Titulacao {
@@ -32,7 +31,7 @@ export const CadTeacherFormSchema = z.object({
   }).refine((val) => val.startsWith("prof."), {
     message: "O email deve começar com 'prof.'.",
   }),
-  status: z.enum([Status.COORDENADOR, Status.COORDENADOR_ADJUNTO, Status.PROFESSOR, Status.PROFESSOR_ADJUNTO, Status.PROFESSOR_SUBSTITUTO, Status.SUSPENSO], {
+  status: z.enum([Status.COORDENADOR, Status.COORDENADOR_ADJUNTO, Status.PROFESSOR, Status.PROFESSOR_ADJUNTO, Status.PROFESSOR_SUBSTITUTO], {
     required_error: "Status é obrigatório.",
   }).default(Status.PROFESSOR),
   senha: z.string().min(8, {

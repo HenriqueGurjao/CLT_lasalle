@@ -30,9 +30,9 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     
     return response; 
   } catch (err: any) {
-      toast({
-        title: "Erro interno no servidor: ",
-      })
+      // toast({
+      //   title: "Erro interno no servidor: ",
+      // })
       try {
         const refreshResponse = await fetch("http://localhost:8000/api/v1/auth/refresh", {
           method: "POST",

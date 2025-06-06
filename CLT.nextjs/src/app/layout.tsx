@@ -38,7 +38,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
           >
             <div className="flex flex-col min-h-screen dark:bg-gray-900">
               <Header />

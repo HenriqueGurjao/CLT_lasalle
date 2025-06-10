@@ -140,7 +140,125 @@ export const ListTccs = ({
                         <Download />
                       </Button>
                     </Link>
-                    {role == "COORDENADOR" && ["/inicio", "/gerenciar_projetos"].includes(path) && (
+                    {
+                    role.startsWith("PROFESSOR") && path !== '/inicio' && (
+                      <>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant={"ghost"}
+                              className="rounded-full cursor-pointer"
+                              onClick={() => (setEdit(true), setProjeto(tcc))}
+                            >
+                              <Pencil />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                              <DialogTitle>Editar</DialogTitle>
+                            </DialogHeader>
+                            <Tabs
+                              defaultValue="projeto"
+                              className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
+                            >
+                              <TabsList
+                                className={`"flex w-full ${
+                                  role === "COORDENADOR"
+                                    ? "grid-cols-5"
+                                    : "grid-cols-1"
+                                }"`}
+                              >
+                                {role === "COORDENADOR" && <></>}
+                                <TabsTrigger
+                                  className="w-full"
+                                  value="projeto"
+                                >
+                                  Projeto
+                                </TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="projeto">
+                                {isEdit ? (
+                                  <EditProjetoFormFields
+                                    isEdit={isEdit}
+                                    projeto={projeto}
+                                  />
+                                ) : (
+                                  <CadProjetoFormFields
+                                    isEdit={isEdit}
+                                    projeto={projeto}
+                                  />
+                                )}
+                              </TabsContent>
+                            </Tabs>
+                          </DialogContent>
+                        </Dialog>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant={"ghost"}
+                              className="rounded-full cursor-pointer"
+                              onClick={() => (setEdit(true), setProjeto(tcc))}
+                            >
+                              <Trash />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                              <DialogTitle>{tcc.titulo}</DialogTitle>
+                            </DialogHeader>
+                            <Tabs
+                              defaultValue="projeto"
+                              className="sm:max-w-3xl max-h-[90%] sm:max-h-[70%]"
+                            >
+                              <TabsList
+                                className={`"flex w-full ${
+                                  role === "COORDENADOR"
+                                    ? "grid-cols-5"
+                                    : "grid-cols-1"
+                                }"`}
+                              >
+                                {role === "COORDENADOR" && <></>}
+                                <TabsTrigger
+                                  className="w-full"
+                                  value="projeto"
+                                >
+                                  Tem certeza que deseja excluir?
+                                </TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="projeto" className="flex justify-center gap-3">
+                                <Button
+                                  variant={"default"}
+                                  onClick={async () => {
+                                    const response = await fetchWithAuth(
+                                      `http://localhost:8000/api/v1/coordenador/professor/projeto-final/${tcc.id}`,
+                                      {
+                                        method: "DELETE",
+                                        credentials: "include",
+                                      }
+                                    );
+                                    if (response && response.ok) {
+                                      window.location.reload();
+                                    } else {
+                                      console.error("Erro ao excluir o projeto");
+                                    }
+                                  }}
+                                >
+                                  Sim
+                                </Button>
+                                <Button
+                                  variant={"destructive"}
+                                  onClick={() => (setEdit(false), setProjeto(null))}
+                                >
+                                  Não
+                                </Button>
+                              </TabsContent>
+                            </Tabs>
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    )}
+                    {
+                    role.startsWith("COORDENADOR") && (
                       <>
                         <Dialog>
                           <DialogTrigger asChild>
